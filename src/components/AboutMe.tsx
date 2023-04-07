@@ -7,7 +7,7 @@ export default function AboutMe() {
 
     return (
     <Center width='100%' bgColor='#242424' color='gray.300' p={10}>
-            <Box whiteSpace='pre-wrap' width={650}  >
+            <Box whiteSpace='pre-wrap' width={640}  >
                 <Heading mb={5}>About Me</Heading>
                 <motion.div
         whileHover={{ scale:1.1 }}>

@@ -11,7 +11,7 @@ export default function Social() {
         <Box>
 
             <Heading>Social</Heading>
-            <VStack p={10}>
+            <VStack p={5} fontSize={17}>
                 <Box  >
                     <Icon as={BsLinkedin} /><Link href="https://www.linkedin.com/in/hugobbr/" isExternal> /Hugobbra</Link>
                 </Box>

@@ -8,6 +8,7 @@ import { Flex, VStack } from '@chakra-ui/react'
 import AboutMe from './components/AboutMe'
 import Icons from './components/Icons'
 import { motion } from 'framer-motion'
+import Experience from './components/Eperience'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -23,6 +24,7 @@ function App() {
         <Header />
         <AboutMe />
         <Icons/>
+        <Experience/>
         <Social />
       </VStack>
       </motion.div>
