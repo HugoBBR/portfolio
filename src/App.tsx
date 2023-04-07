@@ -14,7 +14,7 @@ function App() {
   const [count, setCount] = useState(0)
 
   return (
-    <Flex>
+    <Flex pt={4}>
       <motion.div
       style={{ width: '100%' }}
           initial={{ opacity: 0,  }}
