@@ -1,9 +1,7 @@
-import { Box, Center, Flex, Heading, Text, VStack } from "@chakra-ui/react";
+import { Box, Center, Heading, Text, VStack } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 
 export default function AboutMe() {
-
-
 
     return (
     <Center width='100%' bgColor='#242424' color='gray.300' p={10}>

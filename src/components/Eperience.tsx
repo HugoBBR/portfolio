@@ -5,7 +5,7 @@ export default function Experience() {
 
 
     return (
-        <Box width={650} py={10}>
+        <Box py={10}>
             <Heading mb={6}>
                 Experience
             </Heading>
@@ -20,7 +20,7 @@ export default function Experience() {
                         </AccordionButton>
                     </h2>
                     <AccordionPanel pb={4} whiteSpace='pre-wrap'>
-                        <UnorderedList  textAlign='start' spacing={2}>
+                        <UnorderedList textAlign='start' spacing={2}>
                             <ListItem >Development of a Single sign-on service using .NET and IdentityServer4
                                 Framework</ListItem>
                             <ListItem>Implementation of authentication and authorization on .NET APIs</ListItem>
@@ -36,9 +36,9 @@ export default function Experience() {
                     </AccordionPanel>
                 </AccordionItem>
 
-                <AccordionItem  fontSize={17}>
+                <AccordionItem fontSize={17}>
                     <h2>
-                        <AccordionButton fontSize={18}fontWeight='bolder'>
+                        <AccordionButton fontSize={18} fontWeight='bolder'>
                             <Box as="span" flex='1' >
                                 Tomin Team March 2022 - August 2022
                             </Box>
@@ -46,13 +46,13 @@ export default function Experience() {
                         </AccordionButton>
                     </h2>
                     <AccordionPanel pb={4}>
-                    <UnorderedList  textAlign='start'  spacing={2}>
+                        <UnorderedList textAlign='start' spacing={2}>
                             <ListItem>Full Stack Development on Angular & ASP.NET</ListItem>
                             <ListItem>Use of ASP.NET Core Identity</ListItem>
                         </UnorderedList>
                     </AccordionPanel>
                 </AccordionItem>
-                <AccordionItem  fontSize={17}>
+                <AccordionItem fontSize={17}>
                     <h2>
                         <AccordionButton fontSize={18} fontWeight='bolder'>
                             <Box as="span" flex='1' >
@@ -62,34 +62,33 @@ export default function Experience() {
                         </AccordionButton>
                     </h2>
                     <AccordionPanel pb={4}>
-                    <UnorderedList  textAlign='start'  spacing={2}>
+                        <UnorderedList textAlign='start' spacing={2}>
                             <ListItem>Development and implementation of a web system for inventory
-management for the Veracruz Council for Scientific Research and
-Technological Development</ListItem>
+                                management for the Veracruz Council for Scientific Research and
+                                Technological Development</ListItem>
                             <ListItem>Database normalization</ListItem>
                         </UnorderedList>
                     </AccordionPanel>
                 </AccordionItem>
-                <AccordionItem  fontSize={17}>
+                <AccordionItem fontSize={17}>
                     <h2>
                         <AccordionButton fontSize={18} fontWeight='bolder'>
                             <Box as="span" flex='1' >
-                                Tomin Team February 2021- August 2021
+                                Paraxute February 2021- August 2021
                             </Box>
                             <AccordionIcon />
                         </AccordionButton>
                     </h2>
                     <AccordionPanel pb={4}>
-                    <UnorderedList  textAlign='start'  spacing={2}>
+                        <UnorderedList textAlign='start' spacing={2}>
                             <ListItem>Development of a web system in Laravel for the administration of
-students for the Paraxute music school.
-</ListItem>
+                                students for the Paraxute music school.
+                            </ListItem>
                             <ListItem>Design of database schema.</ListItem>
                         </UnorderedList>
                     </AccordionPanel>
                 </AccordionItem>
             </Accordion>
-
         </Box>
     )
 }

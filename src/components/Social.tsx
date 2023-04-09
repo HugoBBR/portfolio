@@ -1,6 +1,5 @@
-import { Box, Heading, Icon, IconButton, Link, Text, VStack } from "@chakra-ui/react";
+import { Box, Heading, Icon,  Link, VStack } from "@chakra-ui/react";
 import { BsLinkedin, BsGithub } from "react-icons/bs";
-import { motion } from "framer-motion";
 import { FiMail } from "react-icons/fi";
 
 
@@ -9,7 +8,6 @@ export default function Social() {
 
     return (
         <Box>
-
             <Heading>Social</Heading>
             <VStack p={5} fontSize={17}>
                 <Box  >

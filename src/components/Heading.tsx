@@ -1,10 +1,7 @@
-import { Box, Divider, Heading } from "@chakra-ui/react";
+import { Box,  Heading } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 
 export default function Header() {
-
-
-
 
     return (
         <motion.div
@@ -13,10 +10,8 @@ export default function Header() {
             <Box>
 
                 <motion.div
-                    whileHover={{ scale: 1.1 }}
-
-
-                > <Heading size='2xl' mb={4}>
+                    whileHover={{ scale: 1.1 }}>
+                    <Heading size='2xl' mb={4}>
                         Hugo Bonilla
                     </Heading>
                 </motion.div>
