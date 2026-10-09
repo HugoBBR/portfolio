@@ -1,7 +1,52 @@
-import { CheckCheck, Smartphone, Wifi, WifiOff } from "lucide-react";
+import {
+  Bot,
+  CheckCheck,
+  ClipboardCheck,
+  Eye,
+  FileText,
+  GitMerge,
+  KeyRound,
+  Layers,
+  ListChecks,
+  Lock,
+  RefreshCw,
+  Rocket,
+  Search,
+  ShieldCheck,
+  Smartphone,
+  Table2,
+  Timer,
+  Users,
+  Wifi,
+  WifiOff,
+  Zap,
+} from "lucide-react";
 import type { Story } from "~/content/case-studies";
 
-const icons = { offline: WifiOff, save: Smartphone, online: Wifi, synced: CheckCheck };
+const icons: Record<Story["steps"][number]["icon"], React.ComponentType<{ className?: string }>> = {
+  offline: WifiOff,
+  save: Smartphone,
+  online: Wifi,
+  synced: CheckCheck,
+  clipboard: ClipboardCheck,
+  tasks: ListChecks,
+  shield: ShieldCheck,
+  users: Users,
+  eye: Eye,
+  phone: Smartphone,
+  file: FileText,
+  zap: Zap,
+  lock: Lock,
+  search: Search,
+  timer: Timer,
+  layers: Layers,
+  refresh: RefreshCw,
+  key: KeyRound,
+  merge: GitMerge,
+  rocket: Rocket,
+  bot: Bot,
+  table: Table2,
+};
 
 // A plain-language walkthrough: numbered steps, no jargon.
 export function StoryView({ story }: { story: Story }) {

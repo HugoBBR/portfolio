@@ -1,8 +1,3 @@
-export type Diagram = {
-  caption: string;
-  lanes: { label: string; steps: string[]; branches?: { when: string; steps: string[] }[] }[];
-};
-
 type A =
   | "sync"
   | "forms"
@@ -29,7 +24,33 @@ type Animation =
 
 export type Story = {
   caption: string;
-  steps: { icon: "offline" | "save" | "online" | "synced"; title: string; body: string }[];
+  steps: {
+    icon:
+      | "offline"
+      | "save"
+      | "online"
+      | "synced"
+      | "clipboard"
+      | "tasks"
+      | "shield"
+      | "users"
+      | "eye"
+      | "phone"
+      | "file"
+      | "zap"
+      | "lock"
+      | "search"
+      | "timer"
+      | "layers"
+      | "refresh"
+      | "key"
+      | "merge"
+      | "rocket"
+      | "bot"
+      | "table";
+    title: string;
+    body: string;
+  }[];
 };
 
 export type CaseStudy = {
@@ -41,8 +62,7 @@ export type CaseStudy = {
   company: string;
   stack: string[];
   problem: string;
-  diagram?: Diagram;
-  story?: Story;
+  story: Story;
   decisions: { title: string; body: string }[];
   note?: string;
   animation?: Animation | Animation[];
@@ -71,40 +91,29 @@ export const caseStudies: CaseStudy[] = [
     ],
     problem:
       "Business forms lived in a hosted form builder. The goal was versioned, auditable forms in our own database, rolled out gradually, with the QA/QC field audit as the first big workflow: a scored checklist where each failed item gets its own owner, review and history, and everything keeps working offline on phones as an installable web app.",
-    diagram: {
+    story: {
       caption:
-        "Definitions are code, submissions are data, and each form family plugs in as a profile with its own lifecycle.",
-      lanes: [
+        "Behind it: versioned forms, a full history of every change, and permissions checked field by field.",
+      steps: [
         {
-          label: "Definitions",
-          steps: [
-            "Form definition JSON in git",
-            "Validated and hashed on deploy",
-            "Immutable, versioned definition",
-          ],
+          icon: "clipboard",
+          title: "An auditor inspects the site",
+          body: "A scored checklist of 68 items, filled in any order, with notes and photos for anything that fails.",
         },
         {
-          label: "Submissions",
-          steps: ["Submission: context · answers · profile state · revision"],
-          branches: [
-            { when: "Follow-ups", steps: ["Task", "Task entry (permanent, idempotent thread)"] },
-            { when: "History", steps: ["Audit log"] },
-          ],
+          icon: "tasks",
+          title: "Each failed item becomes its own task",
+          body: "Submitting freezes the findings and hands every failed item to the people responsible for fixing it.",
         },
         {
-          label: "QA/QC inspection",
-          steps: ["Draft", "Pending corrective actions", "Closed", "Final PDF"],
-          branches: [{ when: "No failed items needing follow-up", steps: ["Submit", "Closed"] }],
+          icon: "shield",
+          title: "Fixes are reviewed one by one",
+          body: "QA/QC approves each fix or sends it back with a message. Only that one task reopens.",
         },
         {
-          label: "Each corrective action",
-          steps: ["Pending Response Team", "Pending QA/QC approval", "Approved (locked)"],
-          branches: [
-            {
-              when: "Changes requested, with a message",
-              steps: ["Back to the Response Team, this action only"],
-            },
-          ],
+          icon: "synced",
+          title: "The last approval closes it",
+          body: "The inspection closes by itself, and a final PDF is ready whenever someone asks for it.",
         },
       ],
     },
@@ -247,30 +256,30 @@ export const caseStudies: CaseStudy[] = [
     ],
     problem:
       "Investors, advisors and shareholders needed one secure place for their investments, documents and support, on the web and on their phones, on top of data that lives in Salesforce.",
-    diagram: {
+    story: {
       caption:
-        "Both apps talk only to the API; the API is the only thing that talks to Salesforce.",
-      lanes: [
+        "Set up as one repository with shared standards, so it stays consistent as it grows.",
+      steps: [
         {
-          label: "Request path",
-          steps: [
-            "Web or mobile app",
-            "Auth0 sign-in",
-            "FastAPI (backend for the frontend)",
-            "Salesforce",
-          ],
-          branches: [
-            {
-              when: "Advisor opens “view as client”",
-              steps: ["Access check by user type", "The client's own view"],
-            },
-          ],
+          icon: "users",
+          title: "One portal for everyone",
+          body: "Investors, advisors and shareholders each see the pages that fit them.",
         },
         {
-          label: "Shared code",
-          steps: ["Portfolio utilities and types", "Used by web and mobile"],
+          icon: "eye",
+          title: "Advisors see what clients see",
+          body: "A “view as client” mode shows an advisor exactly what their client sees, with the right access checks.",
         },
-        { label: "Delivery", steps: ["Pull request", "Lint, types and tests", "Deploy to dev"] },
+        {
+          icon: "shield",
+          title: "One safe door to Salesforce",
+          body: "Both apps talk to a single API, and that API is the only thing that talks to Salesforce.",
+        },
+        {
+          icon: "phone",
+          title: "Web and mobile, one product",
+          body: "Shared code and one design system keep the web app and the phone app consistent.",
+        },
       ],
     },
     decisions: [
@@ -313,22 +322,28 @@ export const caseStudies: CaseStudy[] = [
     stack: ["AGENTS.md", "Agent playbooks", "Project skills", "GitHub Actions"],
     problem:
       "AI coding tools are fast, but on a production codebase speed without rules is a risk. The goal was conventions and guardrails that make AI-assisted work safe, and checkable by people and agents alike.",
-    diagram: {
+    story: {
       caption: "Agents work freely inside the rules and stop where a person needs to decide.",
-      lanes: [
+      steps: [
         {
-          label: "An agent task",
-          steps: ["Reads AGENTS.md and the playbooks", "Does the work", "Tests and checks run"],
-          branches: [
-            {
-              when: "Touches prod or dev, runs a migration, or deploys",
-              steps: ["Stops", "Waits for a person's approval"],
-            },
-          ],
+          icon: "file",
+          title: "One place to start",
+          body: "An AGENTS.md and playbooks explain how the codebase works and how to change it.",
         },
         {
-          label: "Design docs",
-          steps: ["Doc cites file and line", "Doc and code disagree", "The code wins"],
+          icon: "zap",
+          title: "Safe work runs freely",
+          body: "Editing code, running tests and reading docs need no sign-off.",
+        },
+        {
+          icon: "lock",
+          title: "Risky work waits for a person",
+          body: "Anything that touches real data, migrations or deployments stops until someone approves.",
+        },
+        {
+          icon: "search",
+          title: "Docs you can trust",
+          body: "Docs point to the exact file and line, and when a doc and the code disagree, the code wins.",
         },
       ],
     },
@@ -363,21 +378,28 @@ export const caseStudies: CaseStudy[] = [
     stack: ["Python", "FastAPI", "Redis", "Delta Lake", "Polars", "Parquet", "zstd"],
     problem:
       "API list and report endpoints read Delta Lake tables directly, which was slow, and several API servers were refreshing the same tables at once.",
-    diagram: {
-      caption: "Fresh data is served as is; stale data is served instantly while a refresh runs.",
-      lanes: [
+    story: {
+      caption: "Most people never notice the cache. They just notice that the reports are fast.",
+      steps: [
         {
-          label: "Read path",
-          steps: ["Request", "Delta table reader", "Redis (zstd parquet + version metadata)"],
-          branches: [
-            { when: "Fresh", steps: ["Serve from cache"] },
-            { when: "Older than 5 min", steps: ["Serve cached copy", "Refresh in background"] },
-            {
-              when: "Older than 1 h, or a miss",
-              steps: ["Delta Lake", "Polars", "Parquet", "Redis"],
-            },
-            { when: "Redis down", steps: ["In-memory fallback"] },
-          ],
+          icon: "timer",
+          title: "Slow data, slow pages",
+          body: "Reports used to read the data warehouse directly, which was slow, and several servers did it at once.",
+        },
+        {
+          icon: "layers",
+          title: "Keep a recent copy close",
+          body: "A recent copy sits in a fast cache, so most requests are answered right away.",
+        },
+        {
+          icon: "refresh",
+          title: "Refresh without waiting",
+          body: "When the copy gets old, people still get it instantly while a fresh one loads in the background.",
+        },
+        {
+          icon: "shield",
+          title: "Servers don't pile on",
+          body: "Locks make sure only one server refreshes a table at a time, and if the cache is down the data still loads from the source.",
         },
       ],
     },
@@ -416,17 +438,28 @@ export const caseStudies: CaseStudy[] = [
     stack: ["React", "FastAPI", "Entra ID", "Redis"],
     problem:
       "Different people need different pages and fields, and support staff need to reproduce exactly what a user sees without sharing credentials.",
-    diagram: {
-      caption: "The server enforces; the front end only hides what the user can't use.",
-      lanes: [
-        { label: "Roles", steps: ["Entra ID groups", "Roles", "Pages, tabs & fields"] },
+    story: {
+      caption: "The screen hides what you can't use, and the server is what actually enforces it.",
+      steps: [
         {
-          label: "Impersonation",
-          steps: [
-            "Admin request headers",
-            "Server middleware swaps in the target user",
-            "Session stored in Redis",
-          ],
+          icon: "users",
+          title: "Roles come from the company directory",
+          body: "The groups people belong to in the company directory decide what role they have.",
+        },
+        {
+          icon: "key",
+          title: "Each role sees what it needs",
+          body: "Pages, tabs and fields appear only for the roles that should see them.",
+        },
+        {
+          icon: "shield",
+          title: "The server decides",
+          body: "Hiding things on screen is a convenience. The server checks every request.",
+        },
+        {
+          icon: "eye",
+          title: "Support can step into a user's view",
+          body: "Admins can open a session as another user to see what they see, and it stops safely if something goes wrong.",
         },
       ],
     },
@@ -461,26 +494,28 @@ export const caseStudies: CaseStudy[] = [
     stack: ["GitHub Actions", "Docker", "Azure", "git-filter-repo", "Playwright"],
     problem:
       "Separate front-end and API repos meant duplicated tooling and no single place to test a change end to end.",
-    diagram: {
-      caption: "The Docker image tested in Dev is promoted to production unchanged.",
-      lanes: [
+    story: {
+      caption: "The version that was tested in dev is the version that ships.",
+      steps: [
         {
-          label: "Pull request",
-          steps: [
-            "PR opened",
-            "Preview environment (front end + API)",
-            "Sign-in redirect URLs registered, removed on close",
-          ],
+          icon: "merge",
+          title: "Two repos become one",
+          body: "The front end and the API moved into one repository, keeping the full history of both.",
         },
-        { label: "Main", steps: ["Merge to main", "Deploy to Dev", "End-to-end tests"] },
         {
-          label: "Release",
-          steps: [
-            "GitHub Release",
-            "Staging slot",
-            "Migrations + health checks",
-            "Swap staging and production",
-          ],
+          icon: "eye",
+          title: "Every change gets a preview",
+          body: "Each pull request gets its own temporary copy of the app to try out.",
+        },
+        {
+          icon: "synced",
+          title: "Merging tests it end to end",
+          body: "Merging deploys to a dev environment and runs end-to-end tests.",
+        },
+        {
+          icon: "rocket",
+          title: "Releases swap in safely",
+          body: "A release goes to a staging copy first, then swaps with production once it checks out.",
         },
       ],
     },
@@ -511,34 +546,28 @@ export const caseStudies: CaseStudy[] = [
     stack: ["GitHub Actions", "GitHub App", "Docker", "Azure", "Dependabot", "zizmor"],
     problem:
       "In a busy monorepo, pull requests fall behind main after every merge, a deploy can leave users with an old tab asking for JavaScript files that no longer exist, and every pipeline run costs time. The goal was to automate the repetitive parts without giving automation more power than it needs.",
-    diagram: {
+    story: {
       caption: "Each automation has a narrow job and a safe way to fail.",
-      lanes: [
+      steps: [
         {
-          label: "PR auto-updater",
-          steps: ["Merge to main", "Find ready PRs behind main", "Update them, priority first"],
-          branches: [
-            { when: "Draft, merge conflict or workflow-file change", steps: ["Skipped"] },
-            { when: "Rate limit or server error", steps: ["Retry"] },
-            { when: "PR changed mid-update", steps: ["Re-read it", "Try again"] },
-          ],
+          icon: "bot",
+          title: "Pull requests stay up to date",
+          body: "After every merge, a bot brings ready pull requests up to date, priority ones first.",
         },
         {
-          label: "Safe frontend release",
-          steps: [
-            "New build",
-            "Merged with earlier releases' files",
-            "Live staging slot checked",
-            "Deploy",
-          ],
+          icon: "shield",
+          title: "It knows what to leave alone",
+          body: "Drafts, conflicts and changes to the pipeline itself are skipped, and the bot only has the permissions it needs.",
         },
         {
-          label: "Per-change pipelines",
-          steps: [
-            "Pull request",
-            "Labeled by area, reviewers assigned",
-            "Only the affected pipeline runs",
-          ],
+          icon: "refresh",
+          title: "Deploys don't break open tabs",
+          body: "Old files stay available after a release, so people with an old tab keep working.",
+        },
+        {
+          icon: "zap",
+          title: "Only what changed runs",
+          body: "Each change triggers only the checks for the part of the code it touched, and the pipelines themselves are scanned for security issues.",
         },
       ],
     },
@@ -582,21 +611,28 @@ export const caseStudies: CaseStudy[] = [
     stack: ["Angular", "ag-Grid", ".NET", "MediatR", "EF Core", "Dapper", "Azure Functions"],
     problem:
       "Weekly construction billing covers labor, equipment and markup, and billers expect to work in a grid with the keyboard, like a spreadsheet.",
-    diagram: {
-      caption: "One class per endpoint, with the right data-access tool for each job.",
-      lanes: [
+    story: {
+      caption: "Built so billers can work fast without leaving the keyboard.",
+      steps: [
         {
-          label: "Stack",
-          steps: [
-            "Angular 17 SPA (ag-Grid, Signals, MSAL)",
-            ".NET API: one class per endpoint",
-            "MediatR handlers",
-          ],
-          branches: [
-            { when: "Writes", steps: ["EF Core"] },
-            { when: "Heavy reads", steps: ["Dapper + stored procedures"] },
-            { when: "Reference data", steps: ["Azure Functions", "Nightly ERP sync"] },
-          ],
+          icon: "table",
+          title: "Billing like a spreadsheet",
+          body: "Weekly billing for labor, equipment and markup is edited in a grid, with full keyboard control.",
+        },
+        {
+          icon: "layers",
+          title: "The right tool for each job",
+          body: "Simple saves and heavy reports use different ways of talking to the database.",
+        },
+        {
+          icon: "refresh",
+          title: "Reference data stays fresh",
+          body: "A nightly job brings in reference data from the company's ERP.",
+        },
+        {
+          icon: "rocket",
+          title: "Upgraded, then retired the old app",
+          body: "Angular went from version 13 to 17 in one migration, and users were moved off the old mobile app with an in-app countdown.",
         },
       ],
     },

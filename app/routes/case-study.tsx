@@ -1,7 +1,6 @@
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Link } from "react-router";
 import { animations } from "~/components/animations";
-import { DiagramView } from "~/components/diagram";
 import { Inline } from "~/components/inline";
 import { StoryView } from "~/components/story";
 import { Badge } from "~/components/ui/badge";
@@ -81,7 +80,7 @@ export default function CaseStudy({ params }: Route.ComponentProps) {
       </section>
 
       <section className="mt-12">
-        <h2 className="mb-4 text-3xl">{c.story ? "How it works" : "Architecture"}</h2>
+        <h2 className="mb-4 text-3xl">How it works</h2>
         {anims.map((a) => {
           const Anim = animations[a];
           return (
@@ -90,8 +89,7 @@ export default function CaseStudy({ params }: Route.ComponentProps) {
             </div>
           );
         })}
-        {c.story && <StoryView story={c.story} />}
-        {c.diagram && <DiagramView diagram={c.diagram} />}
+        <StoryView story={c.story} />
       </section>
 
       <section className="mt-12">

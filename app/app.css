@@ -79,27 +79,6 @@
   }
 }
 
-/* Diagram connectors: decorative, hidden from assistive tech with the empty alt. */
-.flow > li:not(:last-child)::after {
-  content: "↓" / "";
-  @apply text-muted-foreground;
-  display: block;
-  padding-left: 1rem;
-  margin-top: 0.25rem;
-}
-@media (min-width: 40rem) {
-  .flow {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  .flow > li:not(:last-child)::after {
-    content: "→" / "";
-    display: inline;
-    margin: 0 0 0 0.5rem;
-  }
-}
-
 /* Workflow: each step lights up in turn. Only opacity animates (a tinted overlay). */
 .step {
   position: relative;
