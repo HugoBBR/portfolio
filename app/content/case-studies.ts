@@ -27,6 +27,11 @@ type Animation =
   | "bot"
   | "guardrails";
 
+export type Story = {
+  caption: string;
+  steps: { icon: "offline" | "save" | "online" | "synced"; title: string; body: string }[];
+};
+
 export type CaseStudy = {
   slug: string;
   title: string;
@@ -36,7 +41,8 @@ export type CaseStudy = {
   company: string;
   stack: string[];
   problem: string;
-  diagram: Diagram;
+  diagram?: Diagram;
+  story?: Story;
   decisions: { title: string; body: string }[];
   note?: string;
   animation?: Animation | Animation[];
@@ -162,31 +168,29 @@ export const caseStudies: CaseStudy[] = [
     stack: ["React", "TypeScript", "PowerSync", "SQLite", "FastAPI", "PostgreSQL", "IndexedDB"],
     problem:
       "Inspectors work inside buildings with no signal. They need to create, fill in, photograph, submit and approve inspections fully offline, and nothing can be lost or applied twice when they reconnect.",
-    diagram: {
-      caption:
-        "Sync, writes and photos each take their own path; the server stays the only writer.",
-      lanes: [
+    story: {
+      caption: "From the field to the office, without anyone having to think about the connection.",
+      steps: [
         {
-          label: "Sync",
-          steps: ["Postgres", "PowerSync", "Per-user sync streams", "SQLite on the device"],
+          icon: "offline",
+          title: "No signal, no problem",
+          body: "An inspector opens the app inside a building with no connection. Everything they need is already on the phone.",
         },
         {
-          label: "Writes",
-          steps: ["UI", "Single write path"],
-          branches: [
-            { when: "Online", steps: ["API", "Postgres"] },
-            {
-              when: "Offline",
-              steps: [
-                "One local transaction: working copy + queued command",
-                "Uploader",
-                "API re-checks every command",
-              ],
-            },
-          ],
+          icon: "save",
+          title: "Work is saved on the phone",
+          body: "Answers, notes and photos are saved as they go and lined up to be sent later.",
         },
-        { label: "Photos", steps: ["Camera", "IndexedDB upload queue", "API", "Blob storage"] },
-        { label: "App shell", steps: ["Service worker", "Pre-cached app shell + sync engine"] },
+        {
+          icon: "online",
+          title: "The signal comes back",
+          body: "The app notices the connection and starts sending, oldest change first.",
+        },
+        {
+          icon: "synced",
+          title: "Nothing lost, nothing doubled",
+          body: "The server checks every change and applies it once, even if it gets sent twice.",
+        },
       ],
     },
     decisions: [

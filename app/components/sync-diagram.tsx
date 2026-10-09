@@ -2,10 +2,10 @@ import { useState } from "react";
 import { OfflineSwitch } from "./offline-ui";
 
 const nodes = [
-  { x: 8, label: "Device" },
-  { x: 132, label: "Queue" },
-  { x: 256, label: "API" },
-  { x: 380, label: "Postgres" },
+  { x: 8, label: "Phone" },
+  { x: 132, label: "Outbox" },
+  { x: 256, label: "Server" },
+  { x: 380, label: "Database" },
 ];
 const stops = ["44px", "62px", "80px"];
 
@@ -19,7 +19,7 @@ export function SyncDiagram() {
       <svg
         viewBox="0 28 480 104"
         role="img"
-        aria-label="Diagram: a device sends changes through a local queue to the API and Postgres."
+        aria-label="Diagram: a phone sends changes through an outbox to the server and the database."
         className={`w-full ${offline ? "is-offline" : ""}`}
       >
         {[0, 1, 2].map((i) => (
@@ -71,14 +71,14 @@ export function SyncDiagram() {
             textAnchor="middle"
             className="fill-muted-foreground text-[13px] font-medium"
           >
-            no signal · changes wait in the queue
+            no signal · changes wait in the outbox
           </text>
         )}
       </svg>
       <figcaption className="mt-2 text-sm text-muted-foreground">
         {offline
-          ? "Offline: edits are saved locally and queued. The server stays the only writer."
-          : "Online: queued edits flow to the API and Postgres, in order. Try the switch above."}
+          ? "Offline: edits are saved on the phone and wait in the outbox. The server stays the only writer."
+          : "Online: waiting edits flow from the phone to the server, in order. Try the switch above."}
       </figcaption>
     </figure>
   );

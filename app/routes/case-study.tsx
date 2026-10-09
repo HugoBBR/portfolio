@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { animations } from "~/components/animations";
 import { DiagramView } from "~/components/diagram";
 import { Inline } from "~/components/inline";
+import { StoryView } from "~/components/story";
 import { Badge } from "~/components/ui/badge";
 import { caseStudies, getCaseStudy } from "~/content/case-studies";
 import { profile } from "~/content/profile";
@@ -80,7 +81,7 @@ export default function CaseStudy({ params }: Route.ComponentProps) {
       </section>
 
       <section className="mt-12">
-        <h2 className="mb-4 text-3xl">Architecture</h2>
+        <h2 className="mb-4 text-3xl">{c.story ? "How it works" : "Architecture"}</h2>
         {anims.map((a) => {
           const Anim = animations[a];
           return (
@@ -89,7 +90,8 @@ export default function CaseStudy({ params }: Route.ComponentProps) {
             </div>
           );
         })}
-        <DiagramView diagram={c.diagram} />
+        {c.story && <StoryView story={c.story} />}
+        {c.diagram && <DiagramView diagram={c.diagram} />}
       </section>
 
       <section className="mt-12">
