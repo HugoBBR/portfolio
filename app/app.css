@@ -17,7 +17,6 @@
   --secondary-foreground: #292524;
   --ring: #166534;
   --link: #166534;
-  --warn: #b45309;
 }
 
 .dark {
@@ -32,7 +31,6 @@
   --secondary-foreground: #e7e5e4;
   --ring: #5bc48b;
   --link: #5bc48b;
-  --warn: #e0a24a;
 }
 
 @theme inline {
@@ -48,7 +46,6 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-ring: var(--ring);
   --color-link: var(--link);
-  --color-warn: var(--warn);
 }
 
 @layer base {
@@ -140,7 +137,6 @@
 .is-offline .pkt {
   animation: pkt-stall 1.4s ease-out forwards;
   animation-delay: calc(var(--i) * 0.35s);
-  fill: var(--warn);
 }
 @keyframes pkt-flow {
   0% {

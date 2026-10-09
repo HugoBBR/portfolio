@@ -99,7 +99,7 @@ export default function Home() {
                   </span>
                   {offline && (
                     <span
-                      className={`mt-2 block text-xs font-semibold ${i === 1 ? "text-warn" : "text-link"}`}
+                      className={`mt-2 block text-xs font-semibold ${i === 1 ? "text-muted-foreground" : "text-link"}`}
                     >
                       {i === 1 ? "⟳ Queued · syncs when online" : "✓ Saved offline"}
                     </span>

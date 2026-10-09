@@ -28,7 +28,7 @@ export function OfflineBanner() {
     <div role="status" className="no-print">
       {offline && (
         <p className="m-0 flex items-center gap-2.5 bg-foreground px-4 py-2 text-[13px] text-background sm:px-6">
-          <span aria-hidden="true" className="size-[7px] shrink-0 rounded-full bg-warn" />
+          <span aria-hidden="true" className="size-[7px] shrink-0 rounded-full bg-link" />
           You’re viewing a cached copy. 3 changes queued; they’ll sync when you’re back online.
         </p>
       )}
