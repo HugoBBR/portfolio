@@ -41,7 +41,7 @@ export const experience: Role[] = [
     end: "2026-06",
     note: "Investor portal",
     highlights: [
-      "Built the investor portal as a monorepo: React web app, Expo mobile app and a FastAPI service in front of Salesforce.",
+      "Established the architecture and tech stack for the investor portal: a monorepo with a React web app, an Expo mobile app and a FastAPI service in front of Salesforce.",
       "Shipped Auth0 sign-in, password reset, advisor tools with “view as client”, dashboards, an event calendar and support tickets.",
       "Created the shared design system and a style-guide page.",
     ],
