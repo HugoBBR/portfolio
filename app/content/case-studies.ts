@@ -33,82 +33,6 @@ export type CaseStudy = {
 // Inline `code` in any string renders as <code>. No code, resource names, tickets or client names here.
 export const caseStudies: CaseStudy[] = [
   {
-    slug: "investor-portal",
-    animation: "personas",
-    title: "An investor portal on web, mobile and a Salesforce API",
-    summary:
-      "A monorepo with a React web app, an Expo mobile app and a FastAPI layer in front of Salesforce, with the architecture and standards set from day one.",
-    year: "2026",
-    role: "Owned",
-    company: "CAZ Investments",
-    stack: [
-      "React",
-      "TypeScript",
-      "TanStack",
-      "shadcn/ui",
-      "Expo",
-      "FastAPI",
-      "Salesforce",
-      "Auth0",
-      "GitHub Actions",
-    ],
-    problem:
-      "Investors, advisors and shareholders needed one secure place for their investments, documents and support, on the web and on their phones, on top of data that lives in Salesforce.",
-    diagram: {
-      caption:
-        "Both apps talk only to the API; the API is the only thing that talks to Salesforce.",
-      lanes: [
-        {
-          label: "Request path",
-          steps: [
-            "Web or mobile app",
-            "Auth0 sign-in",
-            "FastAPI (backend for the frontend)",
-            "Salesforce",
-          ],
-          branches: [
-            {
-              when: "Advisor opens “view as client”",
-              steps: ["Access check by user type", "The client's own view"],
-            },
-          ],
-        },
-        {
-          label: "Shared code",
-          steps: ["Portfolio utilities and types", "Used by web and mobile"],
-        },
-        { label: "Delivery", steps: ["Pull request", "Lint, types and tests", "Deploy to dev"] },
-      ],
-    },
-    decisions: [
-      {
-        title: "One monorepo, three apps",
-        body: "Web, mobile and API live side by side with shared code between the apps, so a change to a data shape reaches every consumer in the same pull request.",
-      },
-      {
-        title: "A backend for the frontend",
-        body: "The FastAPI service is the only thing that talks to Salesforce. Clients never see Salesforce field names: response models map them with aliases, one client wraps queries and error handling, and rate limiting protects the endpoints.",
-      },
-      {
-        title: "Navigation by who you are",
-        body: "Investors, advisors and shareholders get different routes and tabs, checked by user type. Advisors can open a “view as client” session to see exactly what the client sees.",
-      },
-      {
-        title: "A design system from day one",
-        body: "shadcn/ui and Tailwind on the web, with a style-guide page documenting the tokens and components. The mobile app follows the same approach with NativeWind and accessible primitives, so both feel like one product.",
-      },
-      {
-        title: "Quality gates in CI",
-        body: "Biome, type checks and unit tests on every pull request, Playwright end-to-end tests on the web, `ruff`, `mypy` and `pytest` on the API, error tracking with Sentry, and an automatic deploy to dev on merge.",
-      },
-      {
-        title: "Written for people and agents",
-        body: "An `AGENTS.md` describes the layout, commands and conventions, with shared skills and workflows, so new contributors and AI tools follow the same rules from the first commit.",
-      },
-    ],
-    note: "Client data and screens are not shown.",
-  },
-  {
     slug: "forms-platform",
     animation: ["lifecycle", "forms"],
     title: "A forms platform, and QA/QC inspections on top of it",
@@ -284,6 +208,82 @@ export const caseStudies: CaseStudy[] = [
       },
     ],
     note: "Deliberately online-only: PDF generation and conflict resolution.",
+  },
+  {
+    slug: "investor-portal",
+    animation: "personas",
+    title: "An investor portal on web, mobile and a Salesforce API",
+    summary:
+      "A monorepo with a React web app, an Expo mobile app and a FastAPI layer in front of Salesforce, with the architecture and standards set from day one.",
+    year: "2026",
+    role: "Owned",
+    company: "CAZ Investments",
+    stack: [
+      "React",
+      "TypeScript",
+      "TanStack",
+      "shadcn/ui",
+      "Expo",
+      "FastAPI",
+      "Salesforce",
+      "Auth0",
+      "GitHub Actions",
+    ],
+    problem:
+      "Investors, advisors and shareholders needed one secure place for their investments, documents and support, on the web and on their phones, on top of data that lives in Salesforce.",
+    diagram: {
+      caption:
+        "Both apps talk only to the API; the API is the only thing that talks to Salesforce.",
+      lanes: [
+        {
+          label: "Request path",
+          steps: [
+            "Web or mobile app",
+            "Auth0 sign-in",
+            "FastAPI (backend for the frontend)",
+            "Salesforce",
+          ],
+          branches: [
+            {
+              when: "Advisor opens “view as client”",
+              steps: ["Access check by user type", "The client's own view"],
+            },
+          ],
+        },
+        {
+          label: "Shared code",
+          steps: ["Portfolio utilities and types", "Used by web and mobile"],
+        },
+        { label: "Delivery", steps: ["Pull request", "Lint, types and tests", "Deploy to dev"] },
+      ],
+    },
+    decisions: [
+      {
+        title: "One monorepo, three apps",
+        body: "Web, mobile and API live side by side with shared code between the apps, so a change to a data shape reaches every consumer in the same pull request.",
+      },
+      {
+        title: "A backend for the frontend",
+        body: "The FastAPI service is the only thing that talks to Salesforce. Clients never see Salesforce field names: response models map them with aliases, one client wraps queries and error handling, and rate limiting protects the endpoints.",
+      },
+      {
+        title: "Navigation by who you are",
+        body: "Investors, advisors and shareholders get different routes and tabs, checked by user type. Advisors can open a “view as client” session to see exactly what the client sees.",
+      },
+      {
+        title: "A design system from day one",
+        body: "shadcn/ui and Tailwind on the web, with a style-guide page documenting the tokens and components. The mobile app follows the same approach with NativeWind and accessible primitives, so both feel like one product.",
+      },
+      {
+        title: "Quality gates in CI",
+        body: "Biome, type checks and unit tests on every pull request, Playwright end-to-end tests on the web, `ruff`, `mypy` and `pytest` on the API, error tracking with Sentry, and an automatic deploy to dev on merge.",
+      },
+      {
+        title: "Written for people and agents",
+        body: "An `AGENTS.md` describes the layout, commands and conventions, with shared skills and workflows, so new contributors and AI tools follow the same rules from the first commit.",
+      },
+    ],
+    note: "Client data and screens are not shown.",
   },
   {
     slug: "warehouse-cache",
