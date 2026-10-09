@@ -46,7 +46,8 @@ export default function Cv() {
           <p className="mt-2 text-sm text-muted-foreground">
             <a href={`mailto:${profile.email}`}>{profile.email}</a> ·{" "}
             <a href={profile.links.linkedin}>LinkedIn</a> ·{" "}
-            <a href={profile.links.github}>GitHub</a>
+            <a href={profile.links.github}>GitHub</a> ·{" "}
+            <a href={profile.links.githubWork}>GitHub (work)</a>
           </p>
         </div>
         {photo && (

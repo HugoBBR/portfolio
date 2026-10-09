@@ -65,6 +65,12 @@ export default function Home() {
                 href={profile.links.github}
               >
                 GitHub
+              </a>{" "}
+              <a
+                className="underline-offset-4 hover:text-link hover:underline"
+                href={profile.links.githubWork}
+              >
+                GitHub (work)
               </a>
             </nav>
           </div>
@@ -197,6 +203,12 @@ export default function Home() {
           </a>
           <a className="underline underline-offset-4 hover:text-link" href={profile.links.github}>
             GitHub
+          </a>{" "}
+          <a
+            className="underline underline-offset-4 hover:text-link"
+            href={profile.links.githubWork}
+          >
+            GitHub (work)
           </a>
         </p>
       </section>

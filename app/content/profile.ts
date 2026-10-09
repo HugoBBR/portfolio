@@ -10,6 +10,7 @@ export const profile = {
   links: {
     linkedin: "https://www.linkedin.com/in/hugobbr/",
     github: "https://github.com/HugoBBR",
+    githubWork: "https://github.com/HugoBonillaCTTN",
     source: "https://github.com/HugoBBR/portfolio",
   },
   about: [
