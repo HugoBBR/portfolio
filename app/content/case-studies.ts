@@ -3,6 +3,18 @@ export type Diagram = {
   lanes: { label: string; steps: string[]; branches?: { when: string; steps: string[] }[] }[];
 };
 
+type A = "sync" | "forms" | "personas" | "lifecycle" | "cache" | "access" | "pipeline" | "grid";
+
+type Animation =
+  | "sync"
+  | "forms"
+  | "personas"
+  | "lifecycle"
+  | "cache"
+  | "access"
+  | "pipeline"
+  | "grid";
+
 export type CaseStudy = {
   slug: string;
   title: string;
@@ -15,13 +27,14 @@ export type CaseStudy = {
   diagram: Diagram;
   decisions: { title: string; body: string }[];
   note?: string;
-  animation?: "sync" | "forms";
+  animation?: Animation | Animation[];
 };
 
 // Inline `code` in any string renders as <code>. No code, resource names, tickets or client names here.
 export const caseStudies: CaseStudy[] = [
   {
     slug: "investor-portal",
+    animation: "personas",
     title: "An investor portal on web, mobile and a Salesforce API",
     summary:
       "A monorepo with a React web app, an Expo mobile app and a FastAPI layer in front of Salesforce, with the architecture and standards set from day one.",
@@ -96,6 +109,112 @@ export const caseStudies: CaseStudy[] = [
     note: "Client data and screens are not shown.",
   },
   {
+    slug: "forms-platform",
+    animation: ["lifecycle", "forms"],
+    title: "A forms platform, and QA/QC inspections on top of it",
+    summary:
+      "Replaced a hosted form builder with versioned, auditable forms, then built the QA/QC field audit on it: every failed item becomes its own reviewed task.",
+    year: "2026",
+    role: "Owned",
+    company: "Cotton Holdings",
+    stack: [
+      "React",
+      "TypeScript",
+      "FastAPI",
+      "PostgreSQL",
+      "JSONB",
+      "PowerSync",
+      "Microsoft Graph",
+      "Feature flags",
+    ],
+    problem:
+      "Business forms lived in a hosted form builder. The goal was versioned, auditable forms in our own database, rolled out gradually, with the QA/QC field audit as the first big workflow: a scored checklist where each failed item gets its own owner, review and history, and everything keeps working offline on phones as an installable web app.",
+    diagram: {
+      caption:
+        "Definitions are code, submissions are data, and each form family plugs in as a profile with its own lifecycle.",
+      lanes: [
+        {
+          label: "Definitions",
+          steps: [
+            "Form definition JSON in git",
+            "Validated and hashed on deploy",
+            "Immutable, versioned definition",
+          ],
+        },
+        {
+          label: "Submissions",
+          steps: ["Submission: context · answers · profile state · revision"],
+          branches: [
+            { when: "Follow-ups", steps: ["Task", "Task entry (permanent, idempotent thread)"] },
+            { when: "History", steps: ["Audit log"] },
+          ],
+        },
+        {
+          label: "QA/QC inspection",
+          steps: ["Draft", "Pending corrective actions", "Closed", "Final PDF"],
+          branches: [{ when: "No failed items needing follow-up", steps: ["Submit", "Closed"] }],
+        },
+        {
+          label: "Each corrective action",
+          steps: ["Pending Response Team", "Pending QA/QC approval", "Approved (locked)"],
+          branches: [
+            {
+              when: "Changes requested, with a message",
+              steps: ["Back to the Response Team, this action only"],
+            },
+          ],
+        },
+      ],
+    },
+    decisions: [
+      {
+        title: "Definitions live in code",
+        body: "They're reviewed in PRs and loaded at deploy time. Identity is a hash of the normalized content, so reformatting doesn't create a new version. A published version never changes, and drafts stay on the version they started with.",
+      },
+      {
+        title: "Shared platform, per-form rules",
+        body: "The platform handles storage, versions, revisions, retry safety, attachments and history. Each form family (a profile) owns its statuses, validation, scoring and workflow. Task records work for any parent record, so job requisitions reuse the same table, and the remaining audit types become new form definitions with no new code.",
+      },
+      {
+        title: "One task per failed item",
+        body: "Submitting an inspection freezes the findings and creates a follow-up task for each failed item. The inspection becomes a frozen snapshot: findings and scores never change, follow-up work happens on the task records, and every edit to the general information is kept in the history with old and new values.",
+      },
+      {
+        title: "A rejection reopens one action",
+        body: "There is no “submit everything for review” step. QA/QC approves each completed action, which locks it with its photos, or requests changes with a message. Approving the last open action closes the inspection automatically.",
+      },
+      {
+        title: "Permissions checked field by field",
+        body: "The update endpoint compares the before and after value of every field and checks each change against the user's role. A client can't smuggle in a change by resending a whole record. Being on the Response Team says who answers for the work; what each person may do is checked separately.",
+      },
+      {
+        title: "Optimistic concurrency",
+        body: "The server keeps a revision number; the client sends the revision it expects plus a mutation UUID. An out-of-date write is rejected with a 409 and the user picks one complete version. There is no automatic field-by-field merge.",
+      },
+      {
+        title: "Safe to retry",
+        body: "The device generates IDs, so a retried save never creates a second inspection. Every entry in a task's permanent thread has its own ID, and attachments are idempotent by a client-generated UUID, so photos upload in parallel without false conflicts. This is what makes offline sync safe.",
+      },
+      {
+        title: "Submit is one transaction",
+        body: "Online only. The server re-looks up the project in the ERP, validates against the pinned form version, recalculates the score (the browser's score is only instant feedback), waits for every photo upload, then commits status, scores, tasks and history together.",
+      },
+      {
+        title: "Upload limits on both sides",
+        body: "Photos are compressed in the browser to about 0.7 MB and 1920 px. The server checks bytes, type and extension, caps files at 2 MB and allows 25 photos per item. Uploads run at most 3 at once.",
+      },
+      {
+        title: "One email thread per inspection",
+        body: "Notifications started as separate per-person emails. I moved them to one email to everyone through the Microsoft Graph API, so people can reply-all in a single conversation. Each person's opt-out is still honored, outside production emails go only to an allowlist, and the audit log records how many people were notified, not their addresses.",
+      },
+      {
+        title: "Gradual migration",
+        body: "One central router sends each legacy form to the new engine behind its own feature flag. Everything else stays on the old builder. Abandoned drafts are deleted after 15 days, and the Web Locks API keeps each draft editable in one tab.",
+      },
+    ],
+    note: "Everything except submitting, the final PDF and resolving conflicts works with no signal.",
+  },
+  {
     slug: "offline-inspections",
     animation: "sync",
     title: "Field inspections that work with no signal",
@@ -167,72 +286,8 @@ export const caseStudies: CaseStudy[] = [
     note: "Deliberately online-only: PDF generation and conflict resolution.",
   },
   {
-    slug: "forms-platform",
-    animation: "forms",
-    title: "A forms platform to replace a hosted form builder",
-    summary:
-      "Versioned, auditable business forms in our own database, without building a generic form builder.",
-    year: "2026",
-    role: "Owned",
-    company: "Cotton Holdings",
-    stack: ["React", "TypeScript", "FastAPI", "PostgreSQL", "JSONB", "Feature flags"],
-    problem:
-      "Business forms lived in a hosted form builder. The goal was versioned, auditable forms stored in our own database, rolled out gradually and without a risky big-bang switch.",
-    diagram: {
-      caption:
-        "Definitions are code; submissions are data; each form family plugs in as a profile.",
-      lanes: [
-        {
-          label: "Definitions",
-          steps: [
-            "Form definition JSON in git",
-            "Validated and hashed on deploy",
-            "Immutable, versioned definition",
-          ],
-        },
-        {
-          label: "Submissions",
-          steps: ["Submission: context · answers · profile state · revision"],
-          branches: [
-            { when: "Follow-ups", steps: ["Task", "Task entry (permanent, idempotent thread)"] },
-            { when: "History", steps: ["Audit log"] },
-          ],
-        },
-        {
-          label: "Profiles",
-          steps: ["Profile registration", "Validation · scoring · statuses · workflow · UI"],
-        },
-      ],
-    },
-    decisions: [
-      {
-        title: "Definitions live in code",
-        body: "They're reviewed in PRs and loaded at deploy time. Identity is a hash of the normalized content, so reformatting doesn't create a new version. A published version never changes, and drafts stay on the version they started with.",
-      },
-      {
-        title: "Shared platform, per-form rules",
-        body: "The platform handles storage, versions, revisions, retry safety, attachments and history. Each form family (a profile) owns its statuses, validation, scoring and workflow, so a new family is a registration, not a schema change.",
-      },
-      {
-        title: "Optimistic concurrency",
-        body: "The server keeps a revision number; the client sends the revision it expects plus a mutation UUID. An out-of-date write is rejected with a 409 and the user picks one complete version. There is no automatic field-by-field merge.",
-      },
-      {
-        title: "Attachments sit outside the revision",
-        body: "Each one is idempotent by a client-generated UUID, so photos upload in parallel without false conflicts.",
-      },
-      {
-        title: "Finalizing is one transaction",
-        body: "It waits for attachments, re-validates against the pinned definition, then commits status, scores, follow-up tasks and history together.",
-      },
-      {
-        title: "Gradual migration",
-        body: "One central router sends each legacy form to the new engine behind its own feature flag. Everything else stays on the old builder. Abandoned drafts are deleted after 15 days, and the Web Locks API keeps each draft editable in one tab.",
-      },
-    ],
-  },
-  {
     slug: "warehouse-cache",
+    animation: "cache",
     title: "A cache in front of the data warehouse",
     summary:
       "Warehouse tables served from Redis, refreshed in the background, with locks so servers don't pile on.",
@@ -285,6 +340,7 @@ export const caseStudies: CaseStudy[] = [
   },
   {
     slug: "access-control",
+    animation: "access",
     title: "Access control and admin impersonation",
     summary:
       "Roles from Entra ID decide what each user sees, and admins can safely see what a user sees.",
@@ -329,6 +385,7 @@ export const caseStudies: CaseStudy[] = [
   },
   {
     slug: "monorepo-delivery",
+    animation: "pipeline",
     title: "One monorepo, one delivery pipeline",
     summary:
       "Merged React and FastAPI repos with their history intact, plus preview environments and blue/green releases.",
@@ -378,6 +435,7 @@ export const caseStudies: CaseStudy[] = [
   },
   {
     slug: "billing-platform",
+    animation: "grid",
     title: "A construction billing platform",
     summary:
       "Spreadsheet-style billing on Angular and .NET, including a four-major-version Angular upgrade.",

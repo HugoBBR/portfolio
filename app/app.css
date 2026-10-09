@@ -170,10 +170,12 @@
 .chip {
   animation: chip 8s ease-in-out infinite;
   animation-delay: var(--d, 0s);
+  animation-fill-mode: backwards;
 }
 .late {
-  animation: late 8s ease-out infinite;
+  animation: late var(--len, 8s) ease-out infinite;
   animation-delay: var(--d, 0s);
+  animation-fill-mode: backwards;
 }
 @keyframes chip {
   0% {
@@ -207,15 +209,62 @@
   }
 }
 
+/* Persona animation: one panel at a time. Stepped cursor for the billing grid. */
+.persona {
+  animation: persona 9s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+  animation-fill-mode: backwards;
+}
+@keyframes persona {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  4%,
+  30% {
+    opacity: 1;
+    transform: none;
+  }
+  34%,
+  100% {
+    opacity: 0;
+  }
+}
+.cursor {
+  animation: cursor 6s steps(1, end) infinite;
+}
+@keyframes cursor {
+  0% {
+    transform: translate(0, 0);
+  }
+  17% {
+    transform: translate(84px, 0);
+  }
+  34% {
+    transform: translate(168px, 0);
+  }
+  50% {
+    transform: translate(168px, 36px);
+  }
+  67% {
+    transform: translate(84px, 36px);
+  }
+  84% {
+    transform: translate(0, 36px);
+  }
+}
+
 /* Forms animation: fields fill in, the version is published, the audit log fills up. */
 .fld {
   transform-origin: left;
   animation: fld 9s ease-in-out infinite;
   animation-delay: var(--d, 0s);
+  animation-fill-mode: backwards;
 }
 .pop {
   animation: pop 9s ease-out infinite;
   animation-delay: var(--d, 0s);
+  animation-fill-mode: backwards;
 }
 @keyframes fld {
   0%,
@@ -266,7 +315,9 @@
   .fld,
   .pop,
   .chip,
-  .late {
+  .late,
+  .persona,
+  .cursor {
     animation: none !important;
   }
   /* Static fallbacks so nothing is hidden when motion is off. */
@@ -278,6 +329,12 @@
     transform: none;
   }
   .pkt {
+    opacity: 1;
+  }
+  .persona {
+    opacity: 0;
+  }
+  .persona:first-child {
     opacity: 1;
   }
 }

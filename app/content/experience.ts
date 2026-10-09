@@ -16,7 +16,7 @@ export const experience: Role[] = [
     start: "2022-08",
     highlights: [
       "Built an offline-first field inspection app on PowerSync and local SQLite, from sync design to security.",
-      "Replaced a hosted form builder with a versioned, auditable forms platform on React and Postgres.",
+      "Replaced a hosted form builder with a versioned, auditable forms platform, and built the QA/QC inspection workflow on it: scored audits, a reviewed follow-up task for each failed item, field-level permissions and one reply-all email thread per inspection.",
       "Consolidated separate React and FastAPI repos into one monorepo with shared CI, preview environments and blue/green releases on Azure.",
       "Designed role-based access control tied to Entra ID groups, plus admin impersonation.",
       "Started on Angular and .NET (billing apps, Single Sign-On with IdentityServer4), then moved the team's work to React and FastAPI.",

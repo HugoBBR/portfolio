@@ -1,9 +1,8 @@
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Link } from "react-router";
+import { animations } from "~/components/animations";
 import { DiagramView } from "~/components/diagram";
-import { FormAnimation } from "~/components/form-animation";
 import { Inline } from "~/components/inline";
-import { SyncDiagram } from "~/components/sync-diagram";
 import { Badge } from "~/components/ui/badge";
 import { caseStudies, getCaseStudy } from "~/content/case-studies";
 import { profile } from "~/content/profile";
@@ -30,6 +29,7 @@ export default function CaseStudy({ params }: Route.ComponentProps) {
   const c = caseStudies[i];
   const prev = caseStudies[i - 1];
   const next = caseStudies[i + 1];
+  const anims = [c.animation ?? []].flat();
 
   return (
     <article className="mx-auto max-w-3xl pb-16 pt-6">
@@ -81,16 +81,14 @@ export default function CaseStudy({ params }: Route.ComponentProps) {
 
       <section className="mt-12">
         <h2 className="mb-4 text-3xl">Architecture</h2>
-        {c.animation === "sync" && (
-          <div className="mb-4">
-            <SyncDiagram />
-          </div>
-        )}
-        {c.animation === "forms" && (
-          <div className="mb-4">
-            <FormAnimation />
-          </div>
-        )}
+        {anims.map((a) => {
+          const Anim = animations[a];
+          return (
+            <div key={a} className="mb-4">
+              <Anim />
+            </div>
+          );
+        })}
         <DiagramView diagram={c.diagram} />
       </section>
 
