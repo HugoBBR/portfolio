@@ -15,8 +15,8 @@
   --primary-foreground: #fbfaf7;
   --secondary: #f3f1ec;
   --secondary-foreground: #292524;
-  --ring: #166534;
-  --link: #166534;
+  --ring: #5b3fff;
+  --link: #5b3fff;
 }
 
 .dark {
@@ -29,8 +29,8 @@
   --primary-foreground: #141311;
   --secondary: #1f1d1a;
   --secondary-foreground: #e7e5e4;
-  --ring: #5bc48b;
-  --link: #5bc48b;
+  --ring: #a594ff;
+  --link: #a594ff;
 }
 
 @theme inline {
@@ -166,6 +166,47 @@
   }
 }
 
+/* Process animation: inputs drift in, then the tracked request checks off step by step. */
+.chip {
+  animation: chip 8s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+.late {
+  animation: late 8s ease-out infinite;
+  animation-delay: var(--d, 0s);
+}
+@keyframes chip {
+  0% {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  8%,
+  30% {
+    opacity: 1;
+    transform: none;
+  }
+  46%,
+  100% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+}
+@keyframes late {
+  0%,
+  36% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  46%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 /* Forms animation: fields fill in, the version is published, the audit log fills up. */
 .fld {
   transform-origin: left;
@@ -223,12 +264,16 @@
   .pkt,
   .is-offline .pkt,
   .fld,
-  .pop {
+  .pop,
+  .chip,
+  .late {
     animation: none !important;
   }
   /* Static fallbacks so nothing is hidden when motion is off. */
   .fld,
-  .pop {
+  .pop,
+  .chip,
+  .late {
     opacity: 1;
     transform: none;
   }

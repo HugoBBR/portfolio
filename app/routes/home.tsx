@@ -1,13 +1,12 @@
 import { ArrowUpRight, Download } from "lucide-react";
 import { Link } from "react-router";
-import { SyncDiagram } from "~/components/sync-diagram";
+import { ProcessAnimation } from "~/components/process-animation";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { caseStudies } from "~/content/case-studies";
 import { experience } from "~/content/experience";
 import { profile } from "~/content/profile";
 import { formatPeriod } from "~/lib/format";
-import { useOffline } from "~/lib/offline";
 import type { Route } from "./+types/home";
 
 export function meta(_: Route.MetaArgs) {
@@ -25,7 +24,6 @@ export function meta(_: Route.MetaArgs) {
 const eyebrow = "text-xs uppercase tracking-widest text-muted-foreground";
 
 export default function Home() {
-  const { offline } = useOffline();
   const current = experience.filter((r) => !r.earlier);
   const earlier = experience.filter((r) => r.earlier);
 
@@ -71,7 +69,7 @@ export default function Home() {
             </nav>
           </div>
         </div>
-        <SyncDiagram />
+        <ProcessAnimation />
       </section>
 
       <section id="work" className="border-t py-16">
@@ -97,13 +95,6 @@ export default function Home() {
                   <span className="mt-1 block max-w-xl text-sm text-muted-foreground">
                     {c.summary}
                   </span>
-                  {offline && (
-                    <span
-                      className={`mt-2 block text-xs font-semibold ${i === 1 ? "text-muted-foreground" : "text-link"}`}
-                    >
-                      {i === 1 ? "⟳ Queued · syncs when online" : "✓ Saved offline"}
-                    </span>
-                  )}
                 </span>
                 <span className="text-sm tabular-nums text-muted-foreground sm:text-right">
                   {c.year}

@@ -1,4 +1,5 @@
-import { useOffline } from "~/lib/offline";
+import { useState } from "react";
+import { OfflineSwitch } from "./offline-ui";
 
 const nodes = [
   { x: 8, label: "Device" },
@@ -9,9 +10,12 @@ const nodes = [
 const stops = ["44px", "62px", "80px"];
 
 export function SyncDiagram() {
-  const { offline } = useOffline();
+  const [offline, setOffline] = useState(false);
   return (
     <figure className="m-0 rounded-xl border p-4">
+      <div className="mb-3 flex justify-end">
+        <OfflineSwitch offline={offline} onToggle={() => setOffline((o) => !o)} />
+      </div>
       <svg
         viewBox="0 28 480 104"
         role="img"
@@ -74,7 +78,7 @@ export function SyncDiagram() {
       <figcaption className="mt-2 text-sm text-muted-foreground">
         {offline
           ? "Offline: edits are saved locally and queued. The server stays the only writer."
-          : "Online: queued edits flow to the API and Postgres, in order. Try the Offline switch."}
+          : "Online: queued edits flow to the API and Postgres, in order. Try the switch above."}
       </figcaption>
     </figure>
   );

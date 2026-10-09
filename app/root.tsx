@@ -8,10 +8,8 @@ import {
   ScrollRestoration,
 } from "react-router";
 import type { Route } from "./+types/root";
-import { OfflineBanner } from "./components/offline-ui";
 import { SiteFooter } from "./components/site-footer";
 import { SiteHeader } from "./components/site-header";
-import { OfflineProvider } from "./lib/offline";
 import "./app.css";
 
 // Runs before first paint so pre-rendered pages don't flash the wrong theme.
@@ -33,20 +31,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <OfflineProvider>
-          <a
-            href="#main"
-            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
-          >
-            Skip to content
-          </a>
-          <OfflineBanner />
-          <SiteHeader />
-          <main id="main" className="mx-auto max-w-5xl px-4 sm:px-6">
-            {children}
-          </main>
-          <SiteFooter />
-        </OfflineProvider>
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+        >
+          Skip to content
+        </a>
+        <SiteHeader />
+        <main id="main" className="mx-auto max-w-5xl px-4 sm:px-6">
+          {children}
+        </main>
+        <SiteFooter />
         <ScrollRestoration />
         <Scripts />
       </body>

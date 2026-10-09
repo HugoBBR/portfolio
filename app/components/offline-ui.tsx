@@ -1,16 +1,13 @@
-import { useOffline } from "~/lib/offline";
-
-export function OfflineSwitch() {
-  const { offline, toggle } = useOffline();
+export function OfflineSwitch({ offline, onToggle }: { offline: boolean; onToggle: () => void }) {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={offline}
-      onClick={toggle}
+      onClick={onToggle}
       className="flex items-center gap-2 rounded-full border py-1.5 pl-3 pr-2 text-xs font-semibold transition-colors hover:bg-secondary"
     >
-      Offline
+      Go offline
       <span
         className={`relative h-[18px] w-8 rounded-full transition-colors ${offline ? "bg-link" : "bg-muted-foreground/40"}`}
       >
@@ -19,19 +16,5 @@ export function OfflineSwitch() {
         />
       </span>
     </button>
-  );
-}
-
-export function OfflineBanner() {
-  const { offline } = useOffline();
-  return (
-    <div role="status" className="no-print">
-      {offline && (
-        <p className="m-0 flex items-center gap-2.5 bg-foreground px-4 py-2 text-[13px] text-background sm:px-6">
-          <span aria-hidden="true" className="size-[7px] shrink-0 rounded-full bg-link" />
-          You’re viewing a cached copy. 3 changes queued; they’ll sync when you’re back online.
-        </p>
-      )}
-    </div>
   );
 }

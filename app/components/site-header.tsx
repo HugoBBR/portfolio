@@ -2,7 +2,6 @@ import { Moon, Sun } from "lucide-react";
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import { profile } from "~/content/profile";
-import { OfflineSwitch } from "./offline-ui";
 
 const nav = [
   { to: "/#work", label: "Work" },
@@ -39,7 +38,6 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-1">
-          <OfflineSwitch />
           <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle dark mode">
             <Sun aria-hidden="true" className="hidden dark:block" />
             <Moon aria-hidden="true" className="dark:hidden" />

@@ -1,8 +1,8 @@
 export const profile = {
   name: "Hugo Bonilla",
   title: "Full-Stack Software Developer",
-  tagline: "I build business software that keeps working,",
-  taglineAccent: "even offline.",
+  tagline: "I turn messy business processes into software",
+  taglineAccent: "people actually use.",
   line: "React, Python & Azure · Mexico",
   description:
     "I build web applications, automations, and digital products using modern, AI-assisted development workflows. I have hands-on experience with a wide range of AI tools to support research, prototyping, coding, testing, documentation, and product delivery. I combine those tools with solid engineering practices to create practical, reliable, user-focused solutions.",
