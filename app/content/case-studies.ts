@@ -15,12 +15,14 @@ export type CaseStudy = {
   diagram: Diagram;
   decisions: { title: string; body: string }[];
   note?: string;
+  animation?: "sync" | "forms";
 };
 
 // Inline `code` in any string renders as <code>. No code, resource names, tickets or client names here.
 export const caseStudies: CaseStudy[] = [
   {
     slug: "offline-inspections",
+    animation: "sync",
     title: "Field inspections that work with no signal",
     summary:
       "An offline-first QA/QC app where nothing is lost or applied twice when the connection returns.",
@@ -91,6 +93,7 @@ export const caseStudies: CaseStudy[] = [
   },
   {
     slug: "forms-platform",
+    animation: "forms",
     title: "A forms platform to replace a hosted form builder",
     summary:
       "Versioned, auditable business forms in our own database, without building a generic form builder.",

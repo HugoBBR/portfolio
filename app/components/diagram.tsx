@@ -2,14 +2,19 @@ import type { Diagram } from "~/content/case-studies";
 import { Inline } from "./inline";
 
 const chain = "flow m-0 flex list-none flex-col gap-1 p-0";
-const step = "rounded-md border bg-secondary/40 px-3 py-1.5 text-sm";
+const step = "step inline-block rounded-md border bg-secondary/40 px-3 py-1.5 text-sm";
+const STEP_S = 0.7;
 
 function Steps({ steps }: { steps: string[] }) {
+  const cycle = `${steps.length * STEP_S + 3}s`;
   return (
     <ol className={chain}>
-      {steps.map((s) => (
+      {steps.map((s, i) => (
         <li key={s} className="sm:flex sm:items-center">
-          <span className={`${step} inline-block`}>
+          <span
+            className={step}
+            style={{ "--d": `${i * STEP_S}s`, "--cycle": cycle } as React.CSSProperties}
+          >
             <Inline text={s} />
           </span>
         </li>

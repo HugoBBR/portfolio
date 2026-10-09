@@ -1,20 +1,23 @@
 import { ArrowUpRight, Download } from "lucide-react";
 import { Link } from "react-router";
+import { SyncDiagram } from "~/components/sync-diagram";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { caseStudies } from "~/content/case-studies";
 import { experience } from "~/content/experience";
 import { profile } from "~/content/profile";
 import { formatPeriod } from "~/lib/format";
+import { useOffline } from "~/lib/offline";
 import type { Route } from "./+types/home";
 
 export function meta(_: Route.MetaArgs) {
   const title = `${profile.name} · ${profile.title}`;
+  const tagline = `${profile.tagline} ${profile.taglineAccent}`;
   return [
     { title },
-    { name: "description", content: profile.tagline },
+    { name: "description", content: tagline },
     { property: "og:title", content: title },
-    { property: "og:description", content: profile.tagline },
+    { property: "og:description", content: tagline },
     { property: "og:type", content: "website" },
   ];
 }
@@ -22,47 +25,53 @@ export function meta(_: Route.MetaArgs) {
 const eyebrow = "text-xs uppercase tracking-widest text-muted-foreground";
 
 export default function Home() {
+  const { offline } = useOffline();
   const current = experience.filter((r) => !r.earlier);
   const earlier = experience.filter((r) => r.earlier);
 
   return (
     <>
-      <section className="pb-20 pt-10 sm:pt-20">
-        <p className={eyebrow}>
-          {profile.title} · {profile.line}
-        </p>
-        <h1 className="mt-6 max-w-3xl text-5xl leading-[1.05] sm:text-7xl">{profile.tagline}</h1>
-        <p className="mt-8 max-w-prose text-lg text-muted-foreground">{profile.description}</p>
-        <div className="mt-8 flex flex-wrap items-center gap-3">
-          <Button asChild>
-            <a href="#work">View work</a>
-          </Button>
-          <Button asChild variant="outline">
-            <Link to="/cv">
-              <Download aria-hidden="true" /> CV
-            </Link>
-          </Button>
-          <nav aria-label="Social" className="flex gap-5 pl-2 text-sm">
-            <a
-              className="underline-offset-4 hover:text-link hover:underline"
-              href={`mailto:${profile.email}`}
-            >
-              Email
-            </a>
-            <a
-              className="underline-offset-4 hover:text-link hover:underline"
-              href={profile.links.linkedin}
-            >
-              LinkedIn
-            </a>
-            <a
-              className="underline-offset-4 hover:text-link hover:underline"
-              href={profile.links.github}
-            >
-              GitHub
-            </a>
-          </nav>
+      <section className="grid items-center gap-10 pb-20 pt-6 sm:pt-14 lg:grid-cols-[1.15fr_1fr]">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-link">
+            {profile.title} · {profile.line}
+          </p>
+          <h1 className="mt-4 max-w-3xl text-5xl leading-[1.02] tracking-[-0.04em] sm:text-6xl">
+            {profile.tagline} <span className="text-link">{profile.taglineAccent}</span>
+          </h1>
+          <p className="mt-6 max-w-prose text-lg text-muted-foreground">{profile.description}</p>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Button asChild>
+              <a href="#work">View work</a>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/cv">
+                <Download aria-hidden="true" /> CV
+              </Link>
+            </Button>
+            <nav aria-label="Social" className="flex gap-5 pl-2 text-sm">
+              <a
+                className="underline-offset-4 hover:text-link hover:underline"
+                href={`mailto:${profile.email}`}
+              >
+                Email
+              </a>
+              <a
+                className="underline-offset-4 hover:text-link hover:underline"
+                href={profile.links.linkedin}
+              >
+                LinkedIn
+              </a>
+              <a
+                className="underline-offset-4 hover:text-link hover:underline"
+                href={profile.links.github}
+              >
+                GitHub
+              </a>
+            </nav>
+          </div>
         </div>
+        <SyncDiagram />
       </section>
 
       <section id="work" className="border-t py-16">
@@ -80,7 +89,7 @@ export default function Home() {
                 </span>
                 <span className="min-w-0">
                   <span
-                    className="block font-serif text-2xl sm:text-3xl"
+                    className="block font-display text-2xl sm:text-3xl"
                     style={{ viewTransitionName: `title-${c.slug}` }}
                   >
                     {c.title}
@@ -88,6 +97,13 @@ export default function Home() {
                   <span className="mt-1 block max-w-xl text-sm text-muted-foreground">
                     {c.summary}
                   </span>
+                  {offline && (
+                    <span
+                      className={`mt-2 block text-xs font-semibold ${i === 1 ? "text-warn" : "text-link"}`}
+                    >
+                      {i === 1 ? "⟳ Queued · syncs when online" : "✓ Saved offline"}
+                    </span>
+                  )}
                 </span>
                 <span className="text-sm tabular-nums text-muted-foreground sm:text-right">
                   {c.year}
@@ -178,7 +194,7 @@ export default function Home() {
         <h2 className="text-5xl sm:text-6xl">Let’s build something.</h2>
         <p className="mt-6">
           <a
-            className="font-serif text-2xl text-link underline underline-offset-4 sm:text-3xl"
+            className="font-display text-2xl text-link underline underline-offset-4 sm:text-3xl"
             href={`mailto:${profile.email}`}
           >
             {profile.email}

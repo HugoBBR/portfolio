@@ -1,4 +1,4 @@
-import serif from "@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff2?url";
+import interTight from "@fontsource-variable/inter-tight/files/inter-tight-latin-wght-normal.woff2?url";
 import {
   isRouteErrorResponse,
   Links,
@@ -8,8 +8,10 @@ import {
   ScrollRestoration,
 } from "react-router";
 import type { Route } from "./+types/root";
+import { OfflineBanner } from "./components/offline-ui";
 import { SiteFooter } from "./components/site-footer";
 import { SiteHeader } from "./components/site-header";
+import { OfflineProvider } from "./lib/offline";
 import "./app.css";
 
 // Runs before first paint so pre-rendered pages don't flash the wrong theme.
@@ -21,27 +23,30 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#faf7f1" media="(prefers-color-scheme: light)" />
-        <meta name="theme-color" content="#1f1c19" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#141311" media="(prefers-color-scheme: dark)" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="preload" as="font" type="font/woff2" href={serif} crossOrigin="anonymous" />
+        <link rel="preload" as="font" type="font/woff2" href={interTight} crossOrigin="anonymous" />
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: constant theme script, no user input */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <Meta />
         <Links />
       </head>
       <body>
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
-        >
-          Skip to content
-        </a>
-        <SiteHeader />
-        <main id="main" className="mx-auto max-w-5xl px-4 sm:px-6">
-          {children}
-        </main>
-        <SiteFooter />
+        <OfflineProvider>
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+          >
+            Skip to content
+          </a>
+          <OfflineBanner />
+          <SiteHeader />
+          <main id="main" className="mx-auto max-w-5xl px-4 sm:px-6">
+            {children}
+          </main>
+          <SiteFooter />
+        </OfflineProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

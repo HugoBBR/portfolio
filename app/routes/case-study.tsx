@@ -1,7 +1,9 @@
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Link } from "react-router";
 import { DiagramView } from "~/components/diagram";
+import { FormAnimation } from "~/components/form-animation";
 import { Inline } from "~/components/inline";
+import { SyncDiagram } from "~/components/sync-diagram";
 import { Badge } from "~/components/ui/badge";
 import { caseStudies, getCaseStudy } from "~/content/case-studies";
 import { profile } from "~/content/profile";
@@ -79,6 +81,16 @@ export default function CaseStudy({ params }: Route.ComponentProps) {
 
       <section className="mt-12">
         <h2 className="mb-4 text-3xl">Architecture</h2>
+        {c.animation === "sync" && (
+          <div className="mb-4">
+            <SyncDiagram />
+          </div>
+        )}
+        {c.animation === "forms" && (
+          <div className="mb-4">
+            <FormAnimation />
+          </div>
+        )}
         <DiagramView diagram={c.diagram} />
       </section>
 
@@ -112,7 +124,7 @@ export default function CaseStudy({ params }: Route.ComponentProps) {
             <span className={`${eyebrow} flex items-center gap-1`}>
               <ArrowLeft aria-hidden="true" className="size-3" /> Previous
             </span>
-            <span className="mt-1 block font-serif text-xl">{prev.title}</span>
+            <span className="mt-1 block font-display text-xl">{prev.title}</span>
           </Link>
         ) : (
           <span />
@@ -126,7 +138,7 @@ export default function CaseStudy({ params }: Route.ComponentProps) {
             <span className={`${eyebrow} flex items-center gap-1 sm:justify-end`}>
               Next <ArrowRight aria-hidden="true" className="size-3" />
             </span>
-            <span className="mt-1 block font-serif text-xl">{next.title}</span>
+            <span className="mt-1 block font-display text-xl">{next.title}</span>
           </Link>
         )}
       </nav>

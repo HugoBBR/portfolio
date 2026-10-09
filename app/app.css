@@ -1,41 +1,42 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "@fontsource/instrument-serif/400.css";
-@import "@fontsource/instrument-serif/400-italic.css";
+@import "@fontsource-variable/inter-tight";
 @import "@fontsource-variable/inter";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
   color-scheme: light;
-  --background: oklch(0.985 0.006 85);
-  --foreground: oklch(0.22 0.01 60);
-  --muted-foreground: oklch(0.48 0.015 65);
-  --border: oklch(0.88 0.01 80);
-  --primary: oklch(0.22 0.01 60);
-  --primary-foreground: oklch(0.985 0.006 85);
-  --secondary: oklch(0.95 0.01 80);
-  --secondary-foreground: oklch(0.3 0.01 60);
-  --ring: oklch(0.55 0.14 40);
-  --link: oklch(0.5 0.14 40);
+  --background: #fbfaf7;
+  --foreground: #1c1917;
+  --muted-foreground: #57534e;
+  --border: #e7e5e4;
+  --primary: #1c1917;
+  --primary-foreground: #fbfaf7;
+  --secondary: #f3f1ec;
+  --secondary-foreground: #292524;
+  --ring: #166534;
+  --link: #166534;
+  --warn: #b45309;
 }
 
 .dark {
   color-scheme: dark;
-  --background: oklch(0.2 0.008 60);
-  --foreground: oklch(0.95 0.008 85);
-  --muted-foreground: oklch(0.72 0.012 75);
-  --border: oklch(0.32 0.01 60);
-  --primary: oklch(0.95 0.008 85);
-  --primary-foreground: oklch(0.2 0.008 60);
-  --secondary: oklch(0.27 0.01 60);
-  --secondary-foreground: oklch(0.9 0.008 85);
-  --ring: oklch(0.74 0.12 45);
-  --link: oklch(0.76 0.12 45);
+  --background: #141311;
+  --foreground: #f5f3ee;
+  --muted-foreground: #a8a29e;
+  --border: #2b2926;
+  --primary: #f5f3ee;
+  --primary-foreground: #141311;
+  --secondary: #1f1d1a;
+  --secondary-foreground: #e7e5e4;
+  --ring: #5bc48b;
+  --link: #5bc48b;
+  --warn: #e0a24a;
 }
 
 @theme inline {
-  --font-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --font-display: "Inter Tight Variable", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -47,6 +48,7 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-ring: var(--ring);
   --color-link: var(--link);
+  --color-warn: var(--warn);
 }
 
 @layer base {
@@ -61,12 +63,11 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-feature-settings: "cv11", "ss03";
   }
   h1,
   h2,
   h3 {
-    @apply font-serif font-normal tracking-tight;
+    @apply font-display font-semibold tracking-tight;
     text-wrap: balance;
   }
   p,
@@ -102,6 +103,112 @@
   }
 }
 
+/* Workflow: each step lights up in turn. Only opacity animates (a tinted overlay). */
+.step {
+  position: relative;
+  isolation: isolate;
+}
+.step::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--link);
+  opacity: 0;
+  animation: step-glow var(--cycle, 8s) ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+@keyframes step-glow {
+  0%,
+  16%,
+  100% {
+    opacity: 0;
+  }
+  6% {
+    opacity: 0.2;
+  }
+}
+
+/* Sync diagram: packets flow when online, pile up in the local queue when offline. */
+.pkt {
+  fill: var(--link);
+  opacity: 0;
+  animation: pkt-flow 4.2s linear infinite;
+  animation-delay: calc(var(--i) * -1.4s);
+}
+.is-offline .pkt {
+  animation: pkt-stall 1.4s ease-out forwards;
+  animation-delay: calc(var(--i) * 0.35s);
+  fill: var(--warn);
+}
+@keyframes pkt-flow {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  8%,
+  92% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(292px);
+    opacity: 0;
+  }
+}
+@keyframes pkt-stall {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(var(--stop));
+    opacity: 1;
+  }
+}
+
+/* Forms animation: fields fill in, the version is published, the audit log fills up. */
+.fld {
+  transform-origin: left;
+  animation: fld 9s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+.pop {
+  animation: pop 9s ease-out infinite;
+  animation-delay: var(--d, 0s);
+}
+@keyframes fld {
+  0%,
+  4% {
+    transform: scaleX(0);
+  }
+  14%,
+  92% {
+    transform: scaleX(1);
+  }
+  100% {
+    transform: scaleX(0);
+  }
+}
+@keyframes pop {
+  0%,
+  8% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  16%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 /* Page transitions: short crossfade; the case-study title morphs via view-transition-name. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
@@ -115,6 +222,22 @@
   ::view-transition-old(*),
   ::view-transition-new(*) {
     animation: none !important;
+  }
+  .step::before,
+  .pkt,
+  .is-offline .pkt,
+  .fld,
+  .pop {
+    animation: none !important;
+  }
+  /* Static fallbacks so nothing is hidden when motion is off. */
+  .fld,
+  .pop {
+    opacity: 1;
+    transform: none;
+  }
+  .pkt {
+    opacity: 1;
   }
 }
 
