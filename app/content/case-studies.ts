@@ -1,0 +1,355 @@
+export type Diagram = {
+  caption: string;
+  lanes: { label: string; steps: string[]; branches?: { when: string; steps: string[] }[] }[];
+};
+
+export type CaseStudy = {
+  slug: string;
+  title: string;
+  summary: string;
+  year: string;
+  role: "Owned" | "Co-owned" | "Contributed";
+  company: string;
+  stack: string[];
+  problem: string;
+  diagram: Diagram;
+  decisions: { title: string; body: string }[];
+  note?: string;
+};
+
+// Inline `code` in any string renders as <code>. No code, resource names, tickets or client names here.
+export const caseStudies: CaseStudy[] = [
+  {
+    slug: "offline-inspections",
+    title: "Field inspections that work with no signal",
+    summary:
+      "An offline-first QA/QC app where nothing is lost or applied twice when the connection returns.",
+    year: "2026",
+    role: "Owned",
+    company: "Cotton Holdings",
+    stack: ["React", "TypeScript", "PowerSync", "SQLite", "FastAPI", "PostgreSQL", "IndexedDB"],
+    problem:
+      "Inspectors work inside buildings with no signal. They need to create, fill in, photograph, submit and approve inspections fully offline, and nothing can be lost or applied twice when they reconnect.",
+    diagram: {
+      caption:
+        "Sync, writes and photos each take their own path; the server stays the only writer.",
+      lanes: [
+        {
+          label: "Sync",
+          steps: ["Postgres", "PowerSync", "Per-user sync streams", "SQLite on the device"],
+        },
+        {
+          label: "Writes",
+          steps: ["UI", "Single write path"],
+          branches: [
+            { when: "Online", steps: ["API", "Postgres"] },
+            {
+              when: "Offline",
+              steps: [
+                "One local transaction: working copy + queued command",
+                "Uploader",
+                "API re-checks every command",
+              ],
+            },
+          ],
+        },
+        { label: "Photos", steps: ["Camera", "IndexedDB upload queue", "API", "Blob storage"] },
+        { label: "App shell", steps: ["Service worker", "Pre-cached app shell + sync engine"] },
+      ],
+    },
+    decisions: [
+      {
+        title: "One write path",
+        body: "Every change goes through one hook. Online it calls the API; offline it saves a working copy and a queued command in the same local transaction. UI code never checks connectivity itself.",
+      },
+      {
+        title: "The server is the only writer",
+        body: "The device never writes to server tables directly. The API re-checks every queued command, and each handler is idempotent by `mutation_id`, so a retried command has no extra effect.",
+      },
+      {
+        title: "Upload order follows cause and effect",
+        body: "Each submission's commands get increasing sequence numbers. A photo uploads before the comment that references it, repeated saves collapse into the latest, and each command carries the server version it expects, so a queue doesn't trigger false conflicts.",
+      },
+      {
+        title: "Failures are sorted by type",
+        body: "Network and server errors retry. Auth errors refresh the token. Permanent rejections become a visible sync issue, so one bad record never blocks the rest of the queue.",
+      },
+      {
+        title: "Permissions work offline",
+        body: "The device runs a copy of the server's permission function (status, owner, roles), so offline edits are allowed exactly when the server would allow them.",
+      },
+      {
+        title: "Sync only what's needed",
+        body: "Each user receives only inspections they created, are assigned to, or are on the crew for: one bucket per open inspection. Closed inspections stay online-only. Large lookup tables come through the API into IndexedDB, because the sync service bills by the volume it syncs.",
+      },
+      {
+        title: "Security",
+        body: "The API issues short-lived sync tokens, signed with RS256 so the sync service only holds a public key. A signed offline pass lasting up to 24 hours lets the app start cold. Logout, account switch or impersonation wipes the local database, caches, drafts and photos.",
+      },
+    ],
+    note: "Deliberately online-only: PDF generation and conflict resolution.",
+  },
+  {
+    slug: "forms-platform",
+    title: "A forms platform to replace a hosted form builder",
+    summary:
+      "Versioned, auditable business forms in our own database, without building a generic form builder.",
+    year: "2026",
+    role: "Owned",
+    company: "Cotton Holdings",
+    stack: ["React", "TypeScript", "FastAPI", "PostgreSQL", "JSONB", "Feature flags"],
+    problem:
+      "Business forms lived in a hosted form builder. The goal was versioned, auditable forms stored in our own database, rolled out gradually and without a risky big-bang switch.",
+    diagram: {
+      caption:
+        "Definitions are code; submissions are data; each form family plugs in as a profile.",
+      lanes: [
+        {
+          label: "Definitions",
+          steps: [
+            "Form definition JSON in git",
+            "Validated and hashed on deploy",
+            "Immutable, versioned definition",
+          ],
+        },
+        {
+          label: "Submissions",
+          steps: ["Submission: context · answers · profile state · revision"],
+          branches: [
+            { when: "Follow-ups", steps: ["Task", "Task entry (permanent, idempotent thread)"] },
+            { when: "History", steps: ["Audit log"] },
+          ],
+        },
+        {
+          label: "Profiles",
+          steps: ["Profile registration", "Validation · scoring · statuses · workflow · UI"],
+        },
+      ],
+    },
+    decisions: [
+      {
+        title: "Definitions live in code",
+        body: "They're reviewed in PRs and loaded at deploy time. Identity is a hash of the normalized content, so reformatting doesn't create a new version. A published version never changes, and drafts stay on the version they started with.",
+      },
+      {
+        title: "Shared platform, per-form rules",
+        body: "The platform handles storage, versions, revisions, retry safety, attachments and history. Each form family (a profile) owns its statuses, validation, scoring and workflow, so a new family is a registration, not a schema change.",
+      },
+      {
+        title: "Optimistic concurrency",
+        body: "The server keeps a revision number; the client sends the revision it expects plus a mutation UUID. An out-of-date write is rejected with a 409 and the user picks one complete version. There is no automatic field-by-field merge.",
+      },
+      {
+        title: "Attachments sit outside the revision",
+        body: "Each one is idempotent by a client-generated UUID, so photos upload in parallel without false conflicts.",
+      },
+      {
+        title: "Finalizing is one transaction",
+        body: "It waits for attachments, re-validates against the pinned definition, then commits status, scores, follow-up tasks and history together.",
+      },
+      {
+        title: "Gradual migration",
+        body: "One central router sends each legacy form to the new engine behind its own feature flag. Everything else stays on the old builder. Abandoned drafts are deleted after 15 days, and the Web Locks API keeps each draft editable in one tab.",
+      },
+    ],
+  },
+  {
+    slug: "warehouse-cache",
+    title: "A cache in front of the data warehouse",
+    summary:
+      "Warehouse tables served from Redis, refreshed in the background, with locks so servers don't pile on.",
+    year: "2026",
+    role: "Co-owned",
+    company: "Cotton Holdings",
+    stack: ["Python", "FastAPI", "Redis", "Delta Lake", "Polars", "Parquet", "zstd"],
+    problem:
+      "API list and report endpoints read Delta Lake tables directly, which was slow, and several API servers were refreshing the same tables at once.",
+    diagram: {
+      caption: "Fresh data is served as is; stale data is served instantly while a refresh runs.",
+      lanes: [
+        {
+          label: "Read path",
+          steps: ["Request", "Delta table reader", "Redis (zstd parquet + version metadata)"],
+          branches: [
+            { when: "Fresh", steps: ["Serve from cache"] },
+            { when: "Older than 5 min", steps: ["Serve cached copy", "Refresh in background"] },
+            {
+              when: "Older than 1 h, or a miss",
+              steps: ["Delta Lake", "Polars", "Parquet", "Redis"],
+            },
+            { when: "Redis down", steps: ["In-memory fallback"] },
+          ],
+        },
+      ],
+    },
+    decisions: [
+      {
+        title: "Locking at four levels",
+        body: "Within one process, per table across servers, one refresh slot for the whole cluster, and a CPU limit per server. If the cluster slot is busy, a request reads the source directly instead of waiting: availability over efficiency.",
+      },
+      {
+        title: "Compress once",
+        body: "Parquet is zstd-compressed and the cache layer's own compression is off, so data isn't compressed twice.",
+      },
+      {
+        title: "Failure behavior depends on the data",
+        body: "Data caches fall back to the source if Redis fails. Security state, such as impersonation sessions, refuses to proceed instead.",
+      },
+      {
+        title: "Operations",
+        body: "The eviction policy is `volatile-lru` (every key has an expiry), so losing a cached table means a slow first read, not an outage. Logs record hits, misses and refreshes using hashed keys.",
+      },
+      {
+        title: "Related fixes",
+        body: "Removed a slow query-per-row pattern in bulk edit, and cut one API's page size from 50,000 rows to 500.",
+      },
+    ],
+  },
+  {
+    slug: "access-control",
+    title: "Access control and admin impersonation",
+    summary:
+      "Roles from Entra ID decide what each user sees, and admins can safely see what a user sees.",
+    year: "2026",
+    role: "Owned",
+    company: "Cotton Holdings",
+    stack: ["React", "FastAPI", "Entra ID", "Redis"],
+    problem:
+      "Different people need different pages and fields, and support staff need to reproduce exactly what a user sees without sharing credentials.",
+    diagram: {
+      caption: "The server enforces; the front end only hides what the user can't use.",
+      lanes: [
+        { label: "Roles", steps: ["Entra ID groups", "Roles", "Pages, tabs & fields"] },
+        {
+          label: "Impersonation",
+          steps: [
+            "Admin request headers",
+            "Server middleware swaps in the target user",
+            "Session stored in Redis",
+          ],
+        },
+      ],
+    },
+    decisions: [
+      {
+        title: "Roles from groups",
+        body: "Roles come from Entra ID (Azure AD) groups and decide which pages, tabs and fields each user sees. The server enforces this; the front end hides what the user can't use.",
+      },
+      {
+        title: "Impersonation by middleware",
+        body: "An admin starts a session with dedicated request headers. Middleware swaps in the target user and the session lives in Redis.",
+      },
+      {
+        title: "Refuse rather than guess",
+        body: "If Redis is unavailable, impersonation refuses to proceed: a session held by only one server would be unsafe.",
+      },
+      {
+        title: "A race worth fixing",
+        body: "A slow earlier response could cancel a freshly started session in the front end. Fixed so the newest session always wins.",
+      },
+    ],
+  },
+  {
+    slug: "monorepo-delivery",
+    title: "One monorepo, one delivery pipeline",
+    summary:
+      "Merged React and FastAPI repos with their history intact, plus preview environments and blue/green releases.",
+    year: "2026",
+    role: "Co-owned",
+    company: "Cotton Holdings",
+    stack: ["GitHub Actions", "Docker", "Azure", "git-filter-repo", "Playwright"],
+    problem:
+      "Separate front-end and API repos meant duplicated tooling and no single place to test a change end to end.",
+    diagram: {
+      caption: "The Docker image tested in Dev is promoted to production unchanged.",
+      lanes: [
+        {
+          label: "Pull request",
+          steps: [
+            "PR opened",
+            "Preview environment (front end + API)",
+            "Sign-in redirect URLs registered, removed on close",
+          ],
+        },
+        { label: "Main", steps: ["Merge to main", "Deploy to Dev", "End-to-end tests"] },
+        {
+          label: "Release",
+          steps: [
+            "GitHub Release",
+            "Staging slot",
+            "Migrations + health checks",
+            "Swap staging and production",
+          ],
+        },
+      ],
+    },
+    decisions: [
+      {
+        title: "The merge",
+        body: "Combined the repos into `apps/frontend`, `apps/api` and `tests/e2e`. History was rewritten with git-filter-repo so both repos keep their commits.",
+      },
+      {
+        title: "CI that follows the change",
+        body: "PRs are labeled by the area they touch, a bot keeps ready PRs up to date with main, and workflows only run for the area that changed.",
+      },
+      {
+        title: "Delivery flow",
+        body: "Each PR gets a throwaway preview. Merging to main deploys to Dev and runs end-to-end tests. A GitHub Release deploys to a staging slot, runs migrations and health checks, then swaps staging and production. A teammate led the deploy pipelines; I built the monorepo CI around them.",
+      },
+    ],
+  },
+  {
+    slug: "billing-platform",
+    title: "A construction billing platform",
+    summary:
+      "Spreadsheet-style billing on Angular and .NET, including a four-major-version Angular upgrade.",
+    year: "2024",
+    role: "Contributed",
+    company: "Cotton Holdings",
+    stack: ["Angular", "ag-Grid", ".NET", "MediatR", "EF Core", "Dapper", "Azure Functions"],
+    problem:
+      "Weekly construction billing covers labor, equipment and markup, and billers expect to work in a grid with the keyboard, like a spreadsheet.",
+    diagram: {
+      caption: "One class per endpoint, with the right data-access tool for each job.",
+      lanes: [
+        {
+          label: "Stack",
+          steps: [
+            "Angular 17 SPA (ag-Grid, Signals, MSAL)",
+            ".NET API: one class per endpoint",
+            "MediatR handlers",
+          ],
+          branches: [
+            { when: "Writes", steps: ["EF Core"] },
+            { when: "Heavy reads", steps: ["Dapper + stored procedures"] },
+            { when: "Reference data", steps: ["Azure Functions", "Nightly ERP sync"] },
+          ],
+        },
+      ],
+    },
+    decisions: [
+      {
+        title: "Code organized by feature",
+        body: "Each API endpoint is its own class, so each feature is self-contained, with authorization policies on about 40 endpoints.",
+      },
+      {
+        title: "Two data-access tools",
+        body: "EF Core for writes, Dapper with stored procedures for heavy reports.",
+      },
+      {
+        title: "A spreadsheet-style editor",
+        body: "Editable ag-Grid tables with custom cells and full keyboard navigation. Each kind of billing line converts separately and the grid tracks which lines changed.",
+      },
+      {
+        title: "Angular 13 to 17 in one migration",
+        body: "Four major versions at once, TypeScript 4.5 to 5.3, ag-Grid 27 to 31, and a faster build tool.",
+      },
+      {
+        title: "Retiring the legacy app",
+        body: "Moved users off the old Ionic/Cordova app with an in-app countdown that redirected them to the new platform.",
+      },
+    ],
+  },
+];
+
+export const getCaseStudy = (slug?: string) => caseStudies.find((c) => c.slug === slug);
