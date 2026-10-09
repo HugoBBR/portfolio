@@ -84,7 +84,6 @@ export const caseStudies: CaseStudy[] = [
       "TypeScript",
       "FastAPI",
       "PostgreSQL",
-      "JSONB",
       "PowerSync",
       "Microsoft Graph",
       "Feature flags",
@@ -119,48 +118,48 @@ export const caseStudies: CaseStudy[] = [
     },
     decisions: [
       {
-        title: "Definitions live in code",
-        body: "They're reviewed in PRs and loaded at deploy time. Identity is a hash of the normalized content, so reformatting doesn't create a new version. A published version never changes, and drafts stay on the version they started with.",
+        title: "Forms are reviewed like code",
+        body: "Form definitions live in the repository, so changes are reviewed in pull requests and go live with a deploy. Once a version is published it never changes, and drafts stay on the version they started with.",
       },
       {
-        title: "Shared platform, per-form rules",
-        body: "The platform handles storage, versions, revisions, retry safety, attachments and history. Each form family (a profile) owns its statuses, validation, scoring and workflow. Task records work for any parent record, so job requisitions reuse the same table, and the remaining audit types become new form definitions with no new code.",
+        title: "One platform, many kinds of forms",
+        body: "The platform handles storage, versions, history and attachments. Each kind of form, like inspections or job requisitions, adds only its own rules. New forms don't need new database work, and the remaining audit types become new form definitions with no new code.",
       },
       {
         title: "One task per failed item",
-        body: "Submitting an inspection freezes the findings and creates a follow-up task for each failed item. The inspection becomes a frozen snapshot: findings and scores never change, follow-up work happens on the task records, and every edit to the general information is kept in the history with old and new values.",
+        body: "Submitting an inspection locks the findings and creates a follow-up task for each failed item. The inspection stays a frozen record, and every later edit to its general information is kept in the history.",
       },
       {
-        title: "A rejection reopens one action",
-        body: "There is no “submit everything for review” step. QA/QC approves each completed action, which locks it with its photos, or requests changes with a message. Approving the last open action closes the inspection automatically.",
+        title: "A rejection reopens one task",
+        body: "QA/QC approves each fix, or sends it back with a message. Only that task reopens, and approving the last open task closes the inspection automatically.",
       },
       {
-        title: "Permissions checked field by field",
-        body: "The update endpoint compares the before and after value of every field and checks each change against the user's role. A client can't smuggle in a change by resending a whole record. Being on the Response Team says who answers for the work; what each person may do is checked separately.",
+        title: "Permissions checked on every field",
+        body: "The server checks each change against the person's role, so nobody can change something they shouldn't by resending a whole record. Being on the Response Team says who is accountable; what each person can do is checked separately.",
       },
       {
-        title: "Optimistic concurrency",
-        body: "The server keeps a revision number; the client sends the revision it expects plus a mutation UUID. An out-of-date write is rejected with a 409 and the user picks one complete version. There is no automatic field-by-field merge.",
+        title: "Two people, one form",
+        body: "If two people edit at the same time, the second save is stopped and they choose which complete version to keep, instead of a silent merge that could lose work.",
       },
       {
-        title: "Safe to retry",
-        body: "The device generates IDs, so a retried save never creates a second inspection. Every entry in a task's permanent thread has its own ID, and attachments are idempotent by a client-generated UUID, so photos upload in parallel without false conflicts. This is what makes offline sync safe.",
+        title: "Safe to retry on a bad connection",
+        body: "Every save, comment and photo carries its own ID, so sending it twice never creates a duplicate. That is what makes working offline safe.",
       },
       {
-        title: "Submit is one transaction",
-        body: "Online only. The server re-looks up the project in the ERP, validates against the pinned form version, recalculates the score (the browser's score is only instant feedback), waits for every photo upload, then commits status, scores, tasks and history together.",
+        title: "Submitting is all or nothing",
+        body: "When an inspection is submitted online, the server re-checks the project in the company's ERP, validates against the exact form version, recalculates the score and waits for every photo before saving everything together.",
       },
       {
-        title: "Upload limits on both sides",
-        body: "Photos are compressed in the browser to about 0.7 MB and 1920 px. The server checks bytes, type and extension, caps files at 2 MB and allows 25 photos per item. Uploads run at most 3 at once.",
+        title: "Photos stay light",
+        body: "Photos are compressed on the phone before upload, and the server checks the size, type and number again, so nothing oversized gets through.",
       },
       {
         title: "One email thread per inspection",
-        body: "Notifications started as separate per-person emails. I moved them to one email to everyone through the Microsoft Graph API, so people can reply-all in a single conversation. Each person's opt-out is still honored, outside production emails go only to an allowlist, and the audit log records how many people were notified, not their addresses.",
+        body: "Notifications moved from separate emails to one reply-all thread through Microsoft Graph. Opt-outs are still honored, outside production emails only go to a test list, and the audit log records how many people were notified, not their addresses.",
       },
       {
-        title: "Gradual migration",
-        body: "One central router sends each legacy form to the new engine behind its own feature flag. Everything else stays on the old builder. Abandoned drafts are deleted after 15 days, and the Web Locks API keeps each draft editable in one tab.",
+        title: "Rolled out gradually",
+        body: "Each legacy form moved off Form.io behind its own feature flag while the rest stayed where they were. Unfinished drafts are cleaned up after 15 days.",
       },
     ],
     note: "Everything except submitting, the final PDF and resolving conflicts works with no signal.",
@@ -174,7 +173,7 @@ export const caseStudies: CaseStudy[] = [
     year: "2026",
     role: "Owned",
     company: "Cotton Holdings",
-    stack: ["React", "TypeScript", "PowerSync", "SQLite", "FastAPI", "PostgreSQL", "IndexedDB"],
+    stack: ["React", "TypeScript", "PowerSync", "SQLite", "FastAPI", "PostgreSQL"],
     problem:
       "Inspectors work inside buildings with no signal. They need to create, fill in, photograph, submit and approve inspections fully offline, and nothing can be lost or applied twice when they reconnect.",
     story: {
@@ -204,32 +203,32 @@ export const caseStudies: CaseStudy[] = [
     },
     decisions: [
       {
-        title: "One write path",
-        body: "Every change goes through one hook. Online it calls the API; offline it saves a working copy and a queued command in the same local transaction. UI code never checks connectivity itself.",
+        title: "One way to save",
+        body: "Every change goes through a single path: online it goes straight to the server, offline it's saved on the phone and queued. Screens never need to know whether there's a connection.",
       },
       {
-        title: "The server is the only writer",
-        body: "The device never writes to server tables directly. The API re-checks every queued command, and each handler is idempotent by `mutation_id`, so a retried command has no extra effect.",
+        title: "The server has the last word",
+        body: "The phone never writes to the database directly. The FastAPI server re-checks every queued change, and replaying a change twice has no effect.",
       },
       {
-        title: "Upload order follows cause and effect",
-        body: "Each submission's commands get increasing sequence numbers. A photo uploads before the comment that references it, repeated saves collapse into the latest, and each command carries the server version it expects, so a queue doesn't trigger false conflicts.",
+        title: "Changes go out in the right order",
+        body: "Photos upload before the comment that mentions them, repeated saves collapse into the latest one, and each change remembers which version it was based on, so a long queue doesn't cause false conflicts.",
       },
       {
-        title: "Failures are sorted by type",
-        body: "Network and server errors retry. Auth errors refresh the token. Permanent rejections become a visible sync issue, so one bad record never blocks the rest of the queue.",
+        title: "Failures are handled by type",
+        body: "Network hiccups retry, expired sign-ins refresh, and changes the server rejects show up as a clear “sync issue” without blocking everything behind them.",
       },
       {
-        title: "Permissions work offline",
-        body: "The device runs a copy of the server's permission function (status, owner, roles), so offline edits are allowed exactly when the server would allow them.",
+        title: "Permissions work offline too",
+        body: "The phone carries a copy of the server's permission rules, so what you can edit offline matches what the server would allow.",
       },
       {
-        title: "Sync only what's needed",
-        body: "Each user receives only inspections they created, are assigned to, or are on the crew for: one bucket per open inspection. Closed inspections stay online-only. Large lookup tables come through the API into IndexedDB, because the sync service bills by the volume it syncs.",
+        title: "Only the data you need",
+        body: "With PowerSync, each person receives only the inspections they created, are assigned to, or are on the crew for. Closed inspections stay online, and large lookup lists load separately to keep syncing light and affordable.",
       },
       {
-        title: "Security",
-        body: "The API issues short-lived sync tokens, signed with RS256 so the sync service only holds a public key. A signed offline pass lasting up to 24 hours lets the app start cold. Logout, account switch or impersonation wipes the local database, caches, drafts and photos.",
+        title: "Security on a shared phone",
+        body: "Sync uses short-lived tokens, and the sync service only holds the public half of the signing key. A signed pass lets the app start with no signal for up to 24 hours, and signing out or switching users wipes everything stored on the phone.",
       },
     ],
     note: "Deliberately online-only: PDF generation and conflict resolution.",
@@ -284,28 +283,28 @@ export const caseStudies: CaseStudy[] = [
     },
     decisions: [
       {
-        title: "One monorepo, three apps",
-        body: "Web, mobile and API live side by side with shared code between the apps, so a change to a data shape reaches every consumer in the same pull request.",
+        title: "One repository, three apps",
+        body: "Web, mobile and API live together with shared code, so a change to the data reaches every app in the same pull request.",
       },
       {
-        title: "A backend for the frontend",
-        body: "The FastAPI service is the only thing that talks to Salesforce. Clients never see Salesforce field names: response models map them with aliases, one client wraps queries and error handling, and rate limiting protects the endpoints.",
+        title: "One API in front of Salesforce",
+        body: "The FastAPI service is the only thing that talks to Salesforce. The apps never see Salesforce's internal field names: the API translates them, and rate limiting protects it.",
       },
       {
-        title: "Navigation by who you are",
-        body: "Investors, advisors and shareholders get different routes and tabs, checked by user type. Advisors can open a “view as client” session to see exactly what the client sees.",
+        title: "Pages by who you are",
+        body: "Sign-in runs on Auth0. Investors, advisors and shareholders get different pages, and advisors can open a “view as client” session to see exactly what a client sees.",
       },
       {
         title: "A design system from day one",
-        body: "shadcn/ui and Tailwind on the web, with a style-guide page documenting the tokens and components. The mobile app follows the same approach with NativeWind and accessible primitives, so both feel like one product.",
+        body: "shadcn/ui and Tailwind on the web, with a style-guide page documenting colors and components. The Expo mobile app follows the same approach so both feel like one product.",
       },
       {
-        title: "Quality gates in CI",
-        body: "Biome, type checks and unit tests on every pull request, Playwright end-to-end tests on the web, `ruff`, `mypy` and `pytest` on the API, error tracking with Sentry, and an automatic deploy to dev on merge.",
+        title: "Checks on every pull request",
+        body: "GitHub Actions run linters, type checks, unit tests and end-to-end tests on every pull request, Sentry tracks errors, and merging deploys to a dev environment automatically.",
       },
       {
-        title: "Written for people and agents",
-        body: "An `AGENTS.md` describes the layout, commands and conventions, with shared skills and workflows, so new contributors and AI tools follow the same rules from the first commit.",
+        title: "Written for people and AI tools",
+        body: "An AGENTS.md describes the layout, commands and conventions, with shared skills and workflows, so new contributors and AI tools follow the same rules from the first commit.",
       },
     ],
     note: "Client data and screens are not shown.",
@@ -349,20 +348,20 @@ export const caseStudies: CaseStudy[] = [
     },
     decisions: [
       {
-        title: "One entry point",
-        body: "An `AGENTS.md` describes the layout, commands and conventions, with playbooks for the API, the frontend, end-to-end tests and engineering principles, plus project skills that agents and people can both follow.",
+        title: "One place to start",
+        body: "An AGENTS.md explains how the codebase is laid out, how to run things and which conventions to follow, with separate playbooks for the API, the frontend, end-to-end tests and engineering principles, plus project skills.",
       },
       {
         title: "Approval rules",
-        body: "Agents never run anything against prod or dev, run migrations, or deploy without a person's approval. The guardrails make risky actions slow on purpose and everything else fast.",
+        body: "Agents never run anything against prod or dev, run migrations, or deploy without a person's approval. Risky actions are slow on purpose and everything else is fast.",
       },
       {
         title: "Docs you can check",
-        body: "Design docs cite the file and line they describe, with one rule: where the doc and the code disagree, the code wins. That keeps the docs checkable by people and by agents.",
+        body: "Design docs point to the exact file and line they describe, with one rule: where a doc and the code disagree, the code wins. People and agents can both verify them.",
       },
       {
         title: "Used every day",
-        body: "About 220 commits were co-authored with AI tools. The conventions are what made that safe to do on a production codebase.",
+        body: "About 220 commits were co-authored with AI tools. The conventions are what made that safe on a production codebase.",
       },
     ],
   },
@@ -375,7 +374,7 @@ export const caseStudies: CaseStudy[] = [
     year: "2026",
     role: "Co-owned",
     company: "Cotton Holdings",
-    stack: ["Python", "FastAPI", "Redis", "Delta Lake", "Polars", "Parquet", "zstd"],
+    stack: ["Python", "FastAPI", "Redis", "Delta Lake"],
     problem:
       "API list and report endpoints read Delta Lake tables directly, which was slow, and several API servers were refreshing the same tables at once.",
     story: {
@@ -405,24 +404,28 @@ export const caseStudies: CaseStudy[] = [
     },
     decisions: [
       {
-        title: "Locking at four levels",
-        body: "Within one process, per table across servers, one refresh slot for the whole cluster, and a CPU limit per server. If the cluster slot is busy, a request reads the source directly instead of waiting: availability over efficiency.",
+        title: "A copy kept in Redis",
+        body: "Delta Lake tables are stored in Redis, so most requests are answered from memory instead of reading the warehouse every time.",
       },
       {
-        title: "Compress once",
-        body: "Parquet is zstd-compressed and the cache layer's own compression is off, so data isn't compressed twice.",
+        title: "Fast now, fresh soon",
+        body: "When the copy gets old, people still get it instantly while a fresh one loads in the background.",
       },
       {
-        title: "Failure behavior depends on the data",
-        body: "Data caches fall back to the source if Redis fails. Security state, such as impersonation sessions, refuses to proceed instead.",
+        title: "Only one refresh at a time",
+        body: "Locks make sure only one server refreshes a table, and each server has a cap on how much work it does. If the shared slot is busy, a request reads the source directly instead of waiting.",
       },
       {
-        title: "Operations",
-        body: "The eviction policy is `volatile-lru` (every key has an expiry), so losing a cached table means a slow first read, not an outage. Logs record hits, misses and refreshes using hashed keys.",
+        title: "Different data, different failure rules",
+        body: "If Redis is down, ordinary data falls back to the source, but sensitive things like admin sessions refuse to continue rather than risk being wrong.",
       },
       {
-        title: "Related fixes",
-        body: "Removed a slow query-per-row pattern in bulk edit, and cut one API's page size from 50,000 rows to 500.",
+        title: "A cache that can't take the site down",
+        body: "Every entry expires and the oldest are dropped first, so losing a cached table means one slow first request, not an outage.",
+      },
+      {
+        title: "Smaller fixes along the way",
+        body: "I removed a slow lookup-per-row pattern in bulk edit and cut one API's page size from 50,000 rows to 500.",
       },
     ],
   },
@@ -465,20 +468,24 @@ export const caseStudies: CaseStudy[] = [
     },
     decisions: [
       {
-        title: "Roles from groups",
-        body: "Roles come from Entra ID (Azure AD) groups and decide which pages, tabs and fields each user sees. The server enforces this; the front end hides what the user can't use.",
+        title: "Roles from Microsoft Entra ID",
+        body: "Groups in Entra ID (Azure AD) decide which pages, tabs and fields each person sees.",
       },
       {
-        title: "Impersonation by middleware",
-        body: "An admin starts a session with dedicated request headers. Middleware swaps in the target user and the session lives in Redis.",
+        title: "The server enforces it",
+        body: "The screen hides what you can't use, but the API checks every request, so hiding is only a convenience.",
       },
       {
-        title: "Refuse rather than guess",
-        body: "If Redis is unavailable, impersonation refuses to proceed: a session held by only one server would be unsafe.",
+        title: "Support can step into a user's view",
+        body: "An admin can start a session as another user to see exactly what they see. The session is kept in Redis.",
       },
       {
-        title: "A race worth fixing",
-        body: "A slow earlier response could cancel a freshly started session in the front end. Fixed so the newest session always wins.",
+        title: "Fail safe, not open",
+        body: "If Redis is unavailable, impersonation refuses to start rather than risk showing the wrong person's data.",
+      },
+      {
+        title: "A timing bug worth fixing",
+        body: "A slow earlier response could cancel a freshly started session on screen. I fixed it so the newest session always wins.",
       },
     ],
   },
@@ -491,7 +498,7 @@ export const caseStudies: CaseStudy[] = [
     year: "2026",
     role: "Co-owned",
     company: "Cotton Holdings",
-    stack: ["GitHub Actions", "Docker", "Azure", "git-filter-repo", "Playwright"],
+    stack: ["GitHub Actions", "Docker", "Azure", "Playwright"],
     problem:
       "Separate front-end and API repos meant duplicated tooling and no single place to test a change end to end.",
     story: {
@@ -521,16 +528,16 @@ export const caseStudies: CaseStudy[] = [
     },
     decisions: [
       {
-        title: "The merge",
-        body: "Combined the repos into `apps/frontend`, `apps/api` and `tests/e2e`. History was rewritten with git-filter-repo so both repos keep their commits.",
+        title: "Two repos became one",
+        body: "The front end, the API and the end-to-end tests now live together, and the full history of both repos was kept.",
       },
       {
         title: "CI that follows the change",
-        body: "PRs are labeled by the area they touch, a bot keeps ready PRs up to date with main, and workflows only run for the area that changed.",
+        body: "GitHub Actions label pull requests by the area they touch, keep ready ones up to date with main, and run only the checks for what changed.",
       },
       {
-        title: "Delivery flow",
-        body: "Each PR gets a throwaway preview. Merging to main deploys to Dev and runs end-to-end tests. A GitHub Release deploys to a staging slot, runs migrations and health checks, then swaps staging and production. A teammate led the deploy pipelines; I built the monorepo CI around them.",
+        title: "Preview, dev, staging, production",
+        body: "Each pull request gets a temporary preview. Merging deploys to dev and runs end-to-end tests. A GitHub Release goes to a staging copy of the app on Azure, runs database updates and health checks, then swaps with production. The Docker image tested in dev is the one that ships. A teammate led the deploy pipelines; I built the monorepo CI around them.",
       },
     ],
   },
@@ -543,7 +550,7 @@ export const caseStudies: CaseStudy[] = [
     year: "2026",
     role: "Owned",
     company: "Cotton Holdings",
-    stack: ["GitHub Actions", "GitHub App", "Docker", "Azure", "Dependabot", "zizmor"],
+    stack: ["GitHub Actions", "GitHub App", "Docker", "Azure", "Dependabot"],
     problem:
       "In a busy monorepo, pull requests fall behind main after every merge, a deploy can leave users with an old tab asking for JavaScript files that no longer exist, and every pipeline run costs time. The goal was to automate the repetitive parts without giving automation more power than it needs.",
     story: {
@@ -574,27 +581,27 @@ export const caseStudies: CaseStudy[] = [
     decisions: [
       {
         title: "Least-privilege automation",
-        body: "The bot authenticates as a GitHub App with a short-lived token limited to the permissions it needs, not a personal access token. It skips drafts, PRs with merge conflicts and PRs that change workflow files, so it can never push changes to CI configuration.",
+        body: "The bot signs in as a GitHub App with a short-lived token limited to what it needs, not a personal access token. It skips drafts, pull requests with conflicts and anything that changes the workflows, so it can never alter CI configuration.",
       },
       {
-        title: "Built for the failure cases",
-        body: "A PR labeled `queue-priority` is updated first. Rate limits and server errors are retried, and if a PR changes while the bot is updating it, the bot re-reads it and tries again. Runs are queued so two never overlap, and a dry-run mode logs what it would do without changing anything.",
+        title: "Built for the messy cases",
+        body: "A pull request labeled queue-priority goes first. Rate limits and server errors are retried, and if a pull request changes mid-update the bot reads it again and retries. Runs never overlap, and a dry-run mode shows what it would do without changing anything.",
       },
       {
         title: "Old tabs keep working",
-        body: "After a deploy, users with an old tab or a cached service worker requested JavaScript files that no longer existed, and pages failed to load. A release script now combines the new build's files with the files from earlier production releases, so old file names keep working. Before deploying it checks the live staging slot, with timeouts so a stuck slot can't stall the pipeline, and the staging slot is cleaned on each production release.",
+        body: "After a deploy, people with an old tab asked for files that no longer existed and pages failed to load. A release script now keeps earlier releases' files available, and checks the live staging copy first, with timeouts so a stuck one can't stall a release.",
       },
       {
         title: "Run only what changed",
-        body: "Each pipeline runs only for the part of the code that changed, frontend or API. Pull requests are labeled automatically by the area they touch, and reviewers are assigned automatically.",
+        body: "Each pipeline runs only for the part of the code that changed, frontend or API. Pull requests are labeled and assigned reviewers automatically.",
       },
       {
-        title: "Pipelines are scanned too",
-        body: "A security scanner (zizmor) checks the workflows for issues, third-party actions are pinned to exact versions, and Dependabot keeps dependencies up to date.",
+        title: "Pipelines are checked too",
+        body: "A security scanner checks the workflows, third-party actions are pinned to exact versions, and Dependabot keeps dependencies up to date.",
       },
       {
         title: "Shared pipeline pieces",
-        body: "I contributed to blue/green production releases, per-PR preview environments (including a force-publish option) and per-environment feature flags injected at build time. A teammate led those.",
+        body: "I contributed to blue/green production releases, per-pull-request preview environments and per-environment feature flags. A teammate led those.",
       },
     ],
     note: "The PR bot and the safe-release script are my work; the blue/green releases, previews and build-time flags were shared.",
@@ -608,7 +615,7 @@ export const caseStudies: CaseStudy[] = [
     year: "2024",
     role: "Contributed",
     company: "Cotton Holdings",
-    stack: ["Angular", "ag-Grid", ".NET", "MediatR", "EF Core", "Dapper", "Azure Functions"],
+    stack: ["Angular", "ag-Grid", ".NET", "Entity Framework", "Dapper", "Azure Functions"],
     problem:
       "Weekly construction billing covers labor, equipment and markup, and billers expect to work in a grid with the keyboard, like a spreadsheet.",
     story: {
@@ -638,24 +645,24 @@ export const caseStudies: CaseStudy[] = [
     },
     decisions: [
       {
-        title: "Code organized by feature",
-        body: "Each API endpoint is its own class, so each feature is self-contained, with authorization policies on about 40 endpoints.",
+        title: "Organized by feature",
+        body: "Each part of the API is self-contained, with permission rules on about 40 endpoints.",
       },
       {
-        title: "Two data-access tools",
-        body: "EF Core for writes, Dapper with stored procedures for heavy reports.",
+        title: "Two ways to talk to the database",
+        body: "Entity Framework for saving data, and Dapper with stored procedures for heavy reports.",
       },
       {
         title: "A spreadsheet-style editor",
-        body: "Editable ag-Grid tables with custom cells and full keyboard navigation. Each kind of billing line converts separately and the grid tracks which lines changed.",
+        body: "Editable ag-Grid tables with custom cells and full keyboard navigation. Each kind of billing line is handled separately, and the grid tracks which lines changed.",
       },
       {
-        title: "Angular 13 to 17 in one migration",
-        body: "Four major versions at once, TypeScript 4.5 to 5.3, ag-Grid 27 to 31, and a faster build tool.",
+        title: "Angular 13 to 17 in one go",
+        body: "Four major versions at once, with TypeScript, ag-Grid and the build tooling upgraded alongside.",
       },
       {
-        title: "Retiring the legacy app",
-        body: "Moved users off the old Ionic/Cordova app with an in-app countdown that redirected them to the new platform.",
+        title: "Retiring the old app",
+        body: "Users were moved off the old Ionic/Cordova app with an in-app countdown that sent them to the new platform.",
       },
     ],
   },

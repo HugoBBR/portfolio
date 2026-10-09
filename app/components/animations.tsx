@@ -145,7 +145,7 @@ function AccessAnimation() {
   );
 }
 
-const stages = ["Pull request", "Preview", "Dev + e2e", "Staging", "Production"];
+const stages = ["Pull request", "Preview", "Dev + tests", "Staging", "Production"];
 
 function PipelineAnimation() {
   return (

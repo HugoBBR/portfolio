@@ -50,7 +50,7 @@ export const profile = {
         "Docker",
         "GitHub Actions",
         "Entra ID, Auth0 & IdentityServer",
-        "Playwright, Vitest & pytest",
+        "Playwright & automated tests",
         "Sentry",
       ],
     },
