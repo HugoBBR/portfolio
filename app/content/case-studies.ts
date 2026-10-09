@@ -3,7 +3,17 @@ export type Diagram = {
   lanes: { label: string; steps: string[]; branches?: { when: string; steps: string[] }[] }[];
 };
 
-type A = "sync" | "forms" | "personas" | "lifecycle" | "cache" | "access" | "pipeline" | "grid";
+type A =
+  | "sync"
+  | "forms"
+  | "personas"
+  | "lifecycle"
+  | "cache"
+  | "access"
+  | "pipeline"
+  | "grid"
+  | "bot"
+  | "guardrails";
 
 type Animation =
   | "sync"
@@ -13,7 +23,9 @@ type Animation =
   | "cache"
   | "access"
   | "pipeline"
-  | "grid";
+  | "grid"
+  | "bot"
+  | "guardrails";
 
 export type CaseStudy = {
   slug: string;
@@ -286,6 +298,56 @@ export const caseStudies: CaseStudy[] = [
     note: "Client data and screens are not shown.",
   },
   {
+    slug: "ai-guardrails",
+    animation: "guardrails",
+    title: "Making AI-assisted work safe on a production codebase",
+    summary:
+      "An AGENTS.md, agent playbooks and approval rules that let the team use AI tools every day without handing them the keys.",
+    year: "2026",
+    role: "Owned",
+    company: "Cotton Holdings",
+    stack: ["AGENTS.md", "Agent playbooks", "Project skills", "GitHub Actions"],
+    problem:
+      "AI coding tools are fast, but on a production codebase speed without rules is a risk. The goal was conventions and guardrails that make AI-assisted work safe, and checkable by people and agents alike.",
+    diagram: {
+      caption: "Agents work freely inside the rules and stop where a person needs to decide.",
+      lanes: [
+        {
+          label: "An agent task",
+          steps: ["Reads AGENTS.md and the playbooks", "Does the work", "Tests and checks run"],
+          branches: [
+            {
+              when: "Touches prod or dev, runs a migration, or deploys",
+              steps: ["Stops", "Waits for a person's approval"],
+            },
+          ],
+        },
+        {
+          label: "Design docs",
+          steps: ["Doc cites file and line", "Doc and code disagree", "The code wins"],
+        },
+      ],
+    },
+    decisions: [
+      {
+        title: "One entry point",
+        body: "An `AGENTS.md` describes the layout, commands and conventions, with playbooks for the API, the frontend, end-to-end tests and engineering principles, plus project skills that agents and people can both follow.",
+      },
+      {
+        title: "Approval rules",
+        body: "Agents never run anything against prod or dev, run migrations, or deploy without a person's approval. The guardrails make risky actions slow on purpose and everything else fast.",
+      },
+      {
+        title: "Docs you can check",
+        body: "Design docs cite the file and line they describe, with one rule: where the doc and the code disagree, the code wins. That keeps the docs checkable by people and by agents.",
+      },
+      {
+        title: "Used every day",
+        body: "About 220 commits were co-authored with AI tools. The conventions are what made that safe to do on a production codebase.",
+      },
+    ],
+  },
+  {
     slug: "warehouse-cache",
     animation: "cache",
     title: "A cache in front of the data warehouse",
@@ -432,6 +494,77 @@ export const caseStudies: CaseStudy[] = [
         body: "Each PR gets a throwaway preview. Merging to main deploys to Dev and runs end-to-end tests. A GitHub Release deploys to a staging slot, runs migrations and health checks, then swaps staging and production. A teammate led the deploy pipelines; I built the monorepo CI around them.",
       },
     ],
+  },
+  {
+    slug: "ci-automation",
+    animation: "bot",
+    title: "Automation that keeps the pipeline moving",
+    summary:
+      "A GitHub App bot that keeps ready pull requests up to date, safer frontend releases, and CI that only runs for the part of the monorepo that changed.",
+    year: "2026",
+    role: "Owned",
+    company: "Cotton Holdings",
+    stack: ["GitHub Actions", "GitHub App", "Docker", "Azure", "Dependabot", "zizmor"],
+    problem:
+      "In a busy monorepo, pull requests fall behind main after every merge, a deploy can leave users with an old tab asking for JavaScript files that no longer exist, and every pipeline run costs time. The goal was to automate the repetitive parts without giving automation more power than it needs.",
+    diagram: {
+      caption: "Each automation has a narrow job and a safe way to fail.",
+      lanes: [
+        {
+          label: "PR auto-updater",
+          steps: ["Merge to main", "Find ready PRs behind main", "Update them, priority first"],
+          branches: [
+            { when: "Draft, merge conflict or workflow-file change", steps: ["Skipped"] },
+            { when: "Rate limit or server error", steps: ["Retry"] },
+            { when: "PR changed mid-update", steps: ["Re-read it", "Try again"] },
+          ],
+        },
+        {
+          label: "Safe frontend release",
+          steps: [
+            "New build",
+            "Merged with earlier releases' files",
+            "Live staging slot checked",
+            "Deploy",
+          ],
+        },
+        {
+          label: "Per-change pipelines",
+          steps: [
+            "Pull request",
+            "Labeled by area, reviewers assigned",
+            "Only the affected pipeline runs",
+          ],
+        },
+      ],
+    },
+    decisions: [
+      {
+        title: "Least-privilege automation",
+        body: "The bot authenticates as a GitHub App with a short-lived token limited to the permissions it needs, not a personal access token. It skips drafts, PRs with merge conflicts and PRs that change workflow files, so it can never push changes to CI configuration.",
+      },
+      {
+        title: "Built for the failure cases",
+        body: "A PR labeled `queue-priority` is updated first. Rate limits and server errors are retried, and if a PR changes while the bot is updating it, the bot re-reads it and tries again. Runs are queued so two never overlap, and a dry-run mode logs what it would do without changing anything.",
+      },
+      {
+        title: "Old tabs keep working",
+        body: "After a deploy, users with an old tab or a cached service worker requested JavaScript files that no longer existed, and pages failed to load. A release script now combines the new build's files with the files from earlier production releases, so old file names keep working. Before deploying it checks the live staging slot, with timeouts so a stuck slot can't stall the pipeline, and the staging slot is cleaned on each production release.",
+      },
+      {
+        title: "Run only what changed",
+        body: "Each pipeline runs only for the part of the code that changed, frontend or API. Pull requests are labeled automatically by the area they touch, and reviewers are assigned automatically.",
+      },
+      {
+        title: "Pipelines are scanned too",
+        body: "A security scanner (zizmor) checks the workflows for issues, third-party actions are pinned to exact versions, and Dependabot keeps dependencies up to date.",
+      },
+      {
+        title: "Shared pipeline pieces",
+        body: "I contributed to blue/green production releases, per-PR preview environments (including a force-publish option) and per-environment feature flags injected at build time. A teammate led those.",
+      },
+    ],
+    note: "The PR bot and the safe-release script are my work; the blue/green releases, previews and build-time flags were shared.",
   },
   {
     slug: "billing-platform",

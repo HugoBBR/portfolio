@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Check, Lock } from "lucide-react";
 import { FormAnimation } from "./form-animation";
 import { SyncDiagram } from "./sync-diagram";
 
@@ -252,6 +252,89 @@ function LifecycleAnimation() {
   );
 }
 
+const botRows = [
+  { pr: "Add reports export", tag: "queue-priority", base: "Behind main", done: "Updated", d: 0 },
+  { pr: "Fix photo upload retry", base: "Behind main", done: "Updated", d: 0.9 },
+  { pr: "WIP: new dashboard", base: "Draft · skipped" },
+  { pr: "Update CI workflow", base: "Changes workflows · skipped" },
+];
+
+function BotAnimation() {
+  return (
+    <Fig caption="After each merge, ready PRs that fell behind are updated, priority first. Drafts and workflow changes are left alone.">
+      <p className="m-0 mb-3 text-xs">
+        <span className="step rounded-md border bg-secondary/40 px-3 py-1.5">Merged to main</span>
+      </p>
+      <ul className="m-0 list-none space-y-2 p-0 text-xs">
+        {botRows.map((r) => (
+          <li
+            key={r.pr}
+            className="flex items-center justify-between gap-3 rounded-md border px-3 py-2"
+          >
+            <span className="min-w-0 truncate">
+              {r.pr}
+              {r.tag && <code className="ml-2">{r.tag}</code>}
+            </span>
+            <span className="grid shrink-0">
+              <span className="col-start-1 row-start-1 text-right text-muted-foreground">
+                {r.base}
+              </span>
+              {r.done && (
+                <span
+                  className="late col-start-1 row-start-1 flex items-center justify-end gap-1.5 bg-background font-semibold text-link"
+                  style={v({ "--d": `${r.d + 0.6}s` })}
+                >
+                  {ok} {r.done}
+                </span>
+              )}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </Fig>
+  );
+}
+
+const guardRows = [
+  { what: "Edit code and run the tests", ok: "Runs freely", d: 0 },
+  { what: "Read a design doc (file and line)", ok: "Runs freely", d: 0.7 },
+  { what: "Run a migration", wait: "Needs a person", ok: "Approved by a person", d: 1.8 },
+  { what: "Deploy", wait: "Needs a person" },
+  { what: "Touch prod or dev data", wait: "Never without approval" },
+];
+
+function GuardrailAnimation() {
+  return (
+    <Fig caption="Safe actions run freely; risky ones stop and wait for a person.">
+      <ul className="m-0 list-none space-y-2 p-0 text-xs">
+        {guardRows.map((r) => (
+          <li
+            key={r.what}
+            className="flex items-center justify-between gap-3 rounded-md border px-3 py-2"
+          >
+            <span>{r.what}</span>
+            <span className="grid shrink-0">
+              {r.wait && (
+                <span className="col-start-1 row-start-1 flex items-center justify-end gap-1.5 text-right text-muted-foreground">
+                  <Lock className="size-3" /> {r.wait}
+                </span>
+              )}
+              {r.ok && (
+                <span
+                  className="late col-start-1 row-start-1 flex items-center justify-end gap-1.5 bg-background font-semibold text-link"
+                  style={v({ "--d": `${r.d}s` })}
+                >
+                  {ok} {r.ok}
+                </span>
+              )}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </Fig>
+  );
+}
+
 export const animations: Record<string, React.ComponentType> = {
   personas: PersonaAnimation,
   lifecycle: LifecycleAnimation,
@@ -261,4 +344,6 @@ export const animations: Record<string, React.ComponentType> = {
   access: AccessAnimation,
   pipeline: PipelineAnimation,
   grid: GridAnimation,
+  bot: BotAnimation,
+  guardrails: GuardrailAnimation,
 };
