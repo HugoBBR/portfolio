@@ -1,0 +1,39 @@
+name: Deploy
+
+# Deploys to production only when a release is published.
+# Vercel's own git deployments are switched off in vercel.json, so pull requests
+# and pushes to main never deploy.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+
+      - run: npm install --no-audit --no-fund
+      - run: npm run typecheck
+      - run: npm run check
+
+      - run: npx --yes vercel@63.1.0 pull --yes --environment=production --token="$VERCEL_TOKEN"
+      - run: npx --yes vercel@63.1.0 build --prod --token="$VERCEL_TOKEN"
+      - run: npx --yes vercel@63.1.0 deploy --prebuilt --prod --token="$VERCEL_TOKEN"

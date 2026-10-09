@@ -1,0 +1,345 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource-variable/inter-tight";
+@import "@fontsource-variable/inter";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  color-scheme: light;
+  --background: #fbfaf7;
+  --foreground: #1c1917;
+  --muted-foreground: #57534e;
+  --border: #e7e5e4;
+  --primary: #1c1917;
+  --primary-foreground: #fbfaf7;
+  --secondary: #f3f1ec;
+  --secondary-foreground: #292524;
+  --ring: #5b3fff;
+  --link: #5b3fff;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #141311;
+  --foreground: #f5f3ee;
+  --muted-foreground: #a8a29e;
+  --border: #2b2926;
+  --primary: #f5f3ee;
+  --primary-foreground: #141311;
+  --secondary: #1f1d1a;
+  --secondary-foreground: #e7e5e4;
+  --ring: #a594ff;
+  --link: #a594ff;
+}
+
+@theme inline {
+  --font-display: "Inter Tight Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-ring: var(--ring);
+  --color-link: var(--link);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-display font-semibold tracking-tight;
+    text-wrap: balance;
+  }
+  p,
+  li {
+    text-wrap: pretty;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+  code {
+    @apply rounded bg-secondary px-1.5 py-0.5 font-mono text-[0.85em] text-secondary-foreground;
+  }
+}
+
+/* Workflow: each step lights up in turn. Only opacity animates (a tinted overlay). */
+.step {
+  position: relative;
+  isolation: isolate;
+}
+.step::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--link);
+  opacity: 0;
+  animation: step-glow var(--cycle, 8s) ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+@keyframes step-glow {
+  0%,
+  16%,
+  100% {
+    opacity: 0;
+  }
+  6% {
+    opacity: 0.2;
+  }
+}
+
+/* Sync diagram: packets flow when online, pile up in the local queue when offline. */
+.pkt {
+  fill: var(--link);
+  opacity: 0;
+  animation: pkt-flow 4.2s linear infinite;
+  animation-delay: calc(var(--i) * -1.4s);
+}
+.is-offline .pkt {
+  animation: pkt-stall 1.4s ease-out forwards;
+  animation-delay: calc(var(--i) * 0.35s);
+}
+@keyframes pkt-flow {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  8%,
+  92% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(292px);
+    opacity: 0;
+  }
+}
+@keyframes pkt-stall {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(var(--stop));
+    opacity: 1;
+  }
+}
+
+/* Process animation: inputs drift in, then the tracked request checks off step by step. */
+.chip {
+  animation: chip 8s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+  animation-fill-mode: backwards;
+}
+.late {
+  animation: late var(--len, 8s) ease-out infinite;
+  animation-delay: var(--d, 0s);
+  animation-fill-mode: backwards;
+}
+@keyframes chip {
+  0% {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  8%,
+  30% {
+    opacity: 1;
+    transform: none;
+  }
+  46%,
+  100% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+}
+@keyframes late {
+  0%,
+  36% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  46%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Persona animation: one panel at a time. Stepped cursor for the billing grid. */
+.persona {
+  animation: persona 9s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+  animation-fill-mode: backwards;
+}
+@keyframes persona {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  4%,
+  30% {
+    opacity: 1;
+    transform: none;
+  }
+  34%,
+  100% {
+    opacity: 0;
+  }
+}
+.cursor {
+  animation: cursor 6s steps(1, end) infinite;
+}
+@keyframes cursor {
+  0% {
+    transform: translate(0, 0);
+  }
+  17% {
+    transform: translate(84px, 0);
+  }
+  34% {
+    transform: translate(168px, 0);
+  }
+  50% {
+    transform: translate(168px, 36px);
+  }
+  67% {
+    transform: translate(84px, 36px);
+  }
+  84% {
+    transform: translate(0, 36px);
+  }
+}
+
+/* Forms animation: fields fill in, the version is published, the audit log fills up. */
+.fld {
+  transform-origin: left;
+  animation: fld 9s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+  animation-fill-mode: backwards;
+}
+.pop {
+  animation: pop 9s ease-out infinite;
+  animation-delay: var(--d, 0s);
+  animation-fill-mode: backwards;
+}
+@keyframes fld {
+  0%,
+  4% {
+    transform: scaleX(0);
+  }
+  14%,
+  92% {
+    transform: scaleX(1);
+  }
+  100% {
+    transform: scaleX(0);
+  }
+}
+@keyframes pop {
+  0%,
+  8% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  16%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Page transitions: short crossfade; the case-study title morphs via view-transition-name. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+  .step::before,
+  .pkt,
+  .is-offline .pkt,
+  .fld,
+  .pop,
+  .chip,
+  .late,
+  .persona,
+  .cursor {
+    animation: none !important;
+  }
+  /* Static fallbacks so nothing is hidden when motion is off. */
+  .fld,
+  .pop,
+  .chip,
+  .late {
+    opacity: 1;
+    transform: none;
+  }
+  .pkt {
+    opacity: 1;
+  }
+  .persona {
+    opacity: 0;
+  }
+  .persona:first-child {
+    opacity: 1;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 16mm;
+  }
+  :root,
+  .dark {
+    --background: white;
+    --foreground: black;
+    --muted-foreground: #444;
+    --border: #bbb;
+    --link: black;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .cv a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #444;
+  }
+  .cv article {
+    break-inside: avoid;
+  }
+}

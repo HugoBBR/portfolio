@@ -1,0 +1,7 @@
+{
+  "$schema": "https://biomejs.dev/schemas/latest/schema.json",
+  "files": { "includes": ["**", "!build", "!.react-router", "!package-lock.json"] },
+  "formatter": { "indentStyle": "space", "indentWidth": 2, "lineWidth": 100 },
+  "css": { "parser": { "tailwindDirectives": true } },
+  "linter": { "rules": { "complexity": { "noImportantStyles": "off" } } }
+}
