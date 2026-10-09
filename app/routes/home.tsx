@@ -1,6 +1,7 @@
 import { ArrowUpRight, Download } from "lucide-react";
 import { Link } from "react-router";
 import { ProcessAnimation } from "~/components/process-animation";
+import { TechLogos } from "~/components/tech-logos";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { caseStudies } from "~/content/case-studies";
@@ -77,6 +78,8 @@ export default function Home() {
         </div>
         <ProcessAnimation />
       </section>
+
+      <TechLogos />
 
       <section id="work" className="border-t py-16">
         <h2 className="text-4xl">Selected work</h2>
