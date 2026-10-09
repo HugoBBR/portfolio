@@ -40,7 +40,7 @@ export default function Home() {
           <p className="mt-6 max-w-prose text-lg text-muted-foreground">{profile.description}</p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Button asChild>
-              <a href="#work">View work</a>
+              <Link to="/#work">View work</Link>
             </Button>
             <Button asChild variant="outline">
               <Link to="/cv">
