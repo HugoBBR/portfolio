@@ -12,17 +12,16 @@ import { SiteFooter } from "./components/site-footer";
 import { SiteHeader } from "./components/site-header";
 import "./app.css";
 
-// Runs before first paint so pre-rendered pages don't flash the wrong theme.
-const themeScript = `try{var t=localStorage.getItem("theme");if(t==="dark"||(!t&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}`;
+// Dark is the default (class set in the HTML); this runs before first paint to honor a saved light choice.
+const themeScript = `try{if(localStorage.getItem("theme")==="light")document.documentElement.classList.remove("dark")}catch(e){}`;
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)" />
-        <meta name="theme-color" content="#141311" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#141311" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="preload" as="font" type="font/woff2" href={interTight} crossOrigin="anonymous" />
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: constant theme script, no user input */}

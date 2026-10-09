@@ -344,7 +344,8 @@
     size: A4;
     margin: 16mm;
   }
-  :root {
+  :root,
+  .dark {
     --background: white;
     --foreground: black;
     --muted-foreground: #444;
